@@ -103,5 +103,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# vscode
+# VS Code
 .vscode
+
+# Custom
+sandbox.py
