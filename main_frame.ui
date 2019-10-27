@@ -20,8 +20,8 @@
           <property name="sticky">nw</property>
         </layout>
         <child>
-          <object class="ttk.Checkbutton" id="open_champion_capsules">
-            <property name="text" translatable="yes">Open Champion Capsules</property>
+          <object class="ttk.Checkbutton" id="open_generic_chests">
+            <property name="text" translatable="yes">Open Generic Chests</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -32,8 +32,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="open_generic_chests">
-            <property name="text" translatable="yes">Open Generic Chests</property>
+          <object class="ttk.Checkbutton" id="forge_worlds_token">
+            <property name="text" translatable="yes">Forge Worlds Token</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -44,8 +44,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="forge_worlds_token">
-            <property name="text" translatable="yes">Forge Worlds Token</property>
+          <object class="ttk.Checkbutton" id="open_champion_capsules">
+            <property name="text" translatable="yes">Open Champion Capsules</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
