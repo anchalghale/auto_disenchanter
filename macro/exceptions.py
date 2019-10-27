@@ -19,3 +19,7 @@ class RateLimitedException(Exception):
 
 class BadUsernameException(Exception):
     ''' Raised when summoner name is not available '''
+
+
+class LootRetrieveException(Exception):
+    ''' Raised when there is an error when retriving loot '''

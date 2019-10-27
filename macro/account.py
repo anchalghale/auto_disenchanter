@@ -23,6 +23,18 @@ def check_session(connection):
     return 'succeed'
 
 
+def check_riot_session(connection):
+    ''' Checks session of riot client '''
+    res = connection.get('/rso-auth/v1/authorization')
+    if res.status_code == 404:
+        return 'no_authorization'
+    res = connection.get('/eula/v1/agreement')
+    res_json = res.json()
+    if res_json['acceptance'] != 'Accepted':
+        return 'agreement_not_accepted'
+    return 'success'
+
+
 def accept_agreement(connection):
     ''' Accepts the agreemnt '''
     logging.info('Accepting the agreement')
@@ -40,25 +52,24 @@ def logout(riot_connection, league_connection):
 
 def login(connection, username, password):
     ''' Logs in to the client '''
-    logging.info(
-        'Logging in, Username: %s, Password: %s', username, password)
-
-    connection.put('/riotclient/region-locale',
-                   json={'region': REGION, 'locale': LOCALE, })
-    res = connection.post(
-        '/rso-auth/v2/authorizations',
-        json={'clientId': 'riot-client', 'trustLevels': ['always_trusted']})
-    data = {'username': username, 'password': password, 'persistLogin': False}
-    res = connection.put('/rso-auth/v1/session/credentials', json=data)
-    res_json = res.json()
-    if 'message' in res_json:
-        if res_json['message'] == 'authorization_error: consent_required: ':
-            raise ConsentRequiredException
-    if 'error' in res_json:
-        if res_json['error'] == 'auth_failure':
-            raise AuthenticationFailureException
-        if res_json['error'] == 'rate_limited':
-            raise RateLimitedException
+    while check_riot_session(connection) != 'success':
+        logging.info('Logging in, Username: %s, Password: %s', username, password)
+        connection.put('/riotclient/region-locale',
+                       json={'region': REGION, 'locale': LOCALE, })
+        res = connection.post(
+            '/rso-auth/v2/authorizations',
+            json={'clientId': 'riot-client', 'trustLevels': ['always_trusted']})
+        data = {'username': username, 'password': password, 'persistLogin': False}
+        res = connection.put('/rso-auth/v1/session/credentials', json=data)
+        res_json = res.json()
+        if 'message' in res_json:
+            if res_json['message'] == 'authorization_error: consent_required: ':
+                raise ConsentRequiredException
+        if 'error' in res_json:
+            if res_json['error'] == 'auth_failure':
+                raise AuthenticationFailureException
+            if res_json['error'] == 'rate_limited':
+                raise RateLimitedException
 
 
 def set_summoner_name(connection, name):
@@ -75,3 +86,24 @@ def set_summoner_name(connection, name):
             connection.post('/lol-login/v1/new-player-flow-completed')
             return
     raise BadUsernameException
+
+
+def get_owned_champions_count(connection):
+    ''' Parses number of champions owned '''
+    res = connection.get('/lol-champions/v1/owned-champions-minimal')
+    if res.status_code == 404:
+        return -1
+    res_json = res.json()
+    if res_json == []:
+        return -1
+    filtered = list(
+        filter(lambda m: m["ownership"]["owned"], res_json))
+    return len(filtered)
+
+
+def get_be(connection):
+    ''' Parses the blue essence value '''
+    logging.info("Checking blue essence")
+    res = connection.get('/lol-store/v1/wallet')
+    res_json = res.json()
+    return res_json['ip']
