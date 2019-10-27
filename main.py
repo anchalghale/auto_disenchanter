@@ -21,7 +21,9 @@ logging.getLogger().setLevel(logging.INFO)
 urllib3.disable_warnings()
 
 OPTIONS = [
-    'open_chests',
+    'open_champion_capsules',
+    'open_generic_chests',
+    'forge_worlds_token',
     'redeem_free',
     'redeem_450',
     'redeem_1350',
