@@ -19,6 +19,15 @@ def get_key_fragment_count(loot_json):
     return key_fragment[0]['count']
 
 
+def get_worlds_token_count(loot_json):
+    ''' Returns the worlds token count '''
+    key_fragment = list(
+        filter(lambda l: l['lootId'] == 'MATERIAL_337', loot_json))
+    if key_fragment == []:
+        return 0
+    return key_fragment[0]['count']
+
+
 def get_key_count(loot_json):
     ''' Returns the key count '''
     key = list(
@@ -47,6 +56,16 @@ def forge(connection, repeat=1):
             repeat), json=['MATERIAL_key_fragment'])
 
 
+def forge_champion_from_worlds_token(connection, repeat=1):
+    ''' Forges key fragment to keys '''
+    if repeat == 0:
+        return
+    logging.info('Forging %d champion shards from worlds token', repeat)
+    connection.post(
+        '/lol-loot/v1/recipes/MATERIAL_337_FORGE_33/craft?repeat={}'.format(
+            repeat), json=['MATERIAL_337'])
+
+
 def open_generic_chests(connection, repeat=1):
     ''' Opens a chest and saves it data to json '''
     if repeat == 0:
@@ -71,3 +90,14 @@ def forge_keys_and_open_generic_chests(connection):
             continue
         if min(key_count, generic_chest_count) > 0:
             open_generic_chests(connection)
+
+
+def forge_worlds_token(connection):
+    ''' Forges all key fragments and opens all generic chests '''
+    while True:
+        loot_json = get_loot(connection)
+        worlds_token_count = get_worlds_token_count(loot_json)
+        forgable_champion_shards = worlds_token_count//50
+        if forgable_champion_shards == 0:
+            return
+        forge_champion_from_worlds_token(connection, forgable_champion_shards)

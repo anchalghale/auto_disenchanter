@@ -64,8 +64,8 @@ def redeem(connection, value):
         process_redeem(connection, loot_result)
 
 
-def open_chests(connection):
-    ''' Opens the chests '''
+def open_champion_capsules(connection):
+    ''' Opens  all champion capsules '''
     logging.info("Opening all champion capsules")
     while True:
         try:
@@ -74,7 +74,7 @@ def open_chests(connection):
             time.sleep(1)
             continue
         loot_result = list(
-            filter(lambda m: re.fullmatch("CHEST_((?!generic).)*", m["lootId"]), res_json))
+            filter(lambda m: re.fullmatch("CHEST_((?!(generic|224)).)*", m["lootId"]), res_json))
         if loot_result == []:
             return
 
