@@ -28,6 +28,8 @@ class LeagueConnection(Connection):
         }
         self.url = 'https://' + connection['url']
         try:
-            self.get('/lol-service-status/v1/lcu-status')
+            res = self.get('/lol-loot/v1/player-loot')
+            if res.json() == []:
+                raise LeagueConnectionException
         except requests.RequestException:
             raise LeagueConnectionException

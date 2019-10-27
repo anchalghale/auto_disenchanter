@@ -10,15 +10,27 @@ import urllib3
 from connection.league import LeagueConnectionException
 from connection.riot import RiotConnectionException
 from process import is_running
-from settings import (LEAGUE_CLIENT_PATH, LEAGUE_CLIENT_PROCESS,
-                      RIOT_CLIENT_PROCESS, RIOT_CLIENT_SERVICES_PATH)
+from settings import (
+    LEAGUE_CLIENT_PATH, LEAGUE_CLIENT_PROCESS, RIOT_CLIENT_PROCESS,
+    RIOT_CLIENT_SERVICES_PATH, SUMMONER_ICON_ID
+)
 
-from .account import (accept_agreement, check_session, login, logout,
-                      set_summoner_name)
-from .exceptions import (AccountBannedException,
-                         AuthenticationFailureException, BadUsernameException,
-                         ConsentRequiredException, RateLimitedException)
+from .loot import redeem, redeem_free, open_champion_capsules, disenchant
+from .store import buy_champ_by_be
+from .summoner import change_icon
+from .chest import forge_keys_and_open_generic_chests, forge_worlds_token
 from .process import open_league_client, open_riot_client
+from .account import (
+    accept_agreement, check_riot_session, check_session, login, logout,
+    set_summoner_name, get_be, get_owned_champions_count)
+from .exceptions import (
+    AccountBannedException, AuthenticationFailureException,
+    BadUsernameException, ConsentRequiredException, RateLimitedException)
+
+
+def handle_not_implemented():
+    ''' Called when a feature is not implemented '''
+    logging.error('Feature is not implemented')
 
 
 class Macro:
@@ -29,76 +41,50 @@ class Macro:
         self.league_connection = league_connection
 
         self.state = None
-        self.options = []
 
-    def update(self):
-        ''' Updates and returns the state of the client '''
-        self.riot_connection.get_connection()
-        res = self.riot_connection.get('/rso-auth/v1/authorization')
-        if self.options == []:
-            if is_running(LEAGUE_CLIENT_PROCESS) or res.status_code != 404:
-                return 'logout'
-            return 'completed'
-        if res.status_code == 404:
-            return 'no_authorization'
-        res = self.riot_connection.get('/eula/v1/agreement')
-        res_json = res.json()
-        if res_json['acceptance'] != 'Accepted':
-            return 'agreement_not_accepted'
-        if not is_running(LEAGUE_CLIENT_PROCESS):
-            return 'no_league_client'
-        self.league_connection.get_connection()
-        session = check_session(self.league_connection)
-        if session == 'new_player':
-            return 'new_player'
-        return self.options[0]
-
-    def start_worlds_mission(self):
-        ''' Starts the worlds mission if exists '''
-        res = self.league_connection.get('/lol-missions/v1/series')
-        res_json = res.json()
-        worlds = list(filter(lambda m: m['internalName'] == 'Worlds2019B_series', res_json))
-        if worlds == []:
-            return
-        if worlds[0]['status'] == 'PENDING':
-            logging.info('Starting worlds mission')
-            self.league_connection.put(
-                '/lol-missions/v2/player/opt',
-                json={"seriesId": worlds[0]['id'], "option": "OPT_IN"})
-            return
-        self.options = self.options[1:]
+    def get_league_connection(self):
+        ''' Parses the league connection from lockfile '''
+        while True:
+            try:
+                self.league_connection.get_connection()
+                return
+            except LeagueConnectionException:
+                time.sleep(1)
 
     def do_macro(self, options, username, password):
         ''' Calls the macro fucntion according to state '''
-        self.options = options
-        while True:
-            handlers = {
-                'no_authorization': (login, [self.riot_connection, username, password], {}),
-                'agreement_not_accepted': (accept_agreement, [self.riot_connection], {}),
-                'no_league_client': (open_league_client, [], {}),
-                'new_player': (set_summoner_name, [self.league_connection, username], {}),
-                'start_worlds_mission': (self.start_worlds_mission, [], {}),
-                'logout': (logout, [self.riot_connection, self.league_connection], {}),
-            }
-            try:
-                open_riot_client()
-                self.state = self.update()
-                if self.state == 'completed':
-                    return
-                func = handlers[self.state]
-                func[0](*func[1], *func[2])
-            except (RiotConnectionException, LeagueConnectionException):
-                pass
-            except AccountBannedException:
-                logging.info('Account is banned')
-                self.options = []
-            except BadUsernameException:
-                logging.info('Account has no summoner name available')
-                self.options = []
-            except RateLimitedException:
-                logging.info('Rate limited, waiting for 5 minutes')
-                time.sleep(300)
-            except requests.exceptions.RequestException:
-                pass
-            finally:
-                time.sleep(1)
+
+        login(self.riot_connection, username, password)
+        logging.info('Login successful')
+        logging.info('Waiting for league client to come online')
+        self.get_league_connection()
+        handlers = {
+            'open_champion_capsules': (open_champion_capsules, [self.league_connection], {}),
+            'open_generic_chests': (forge_keys_and_open_generic_chests, [self.league_connection], {}),
+            'forge_worlds_token': (forge_worlds_token, [self.league_connection], {}),
+            'redeem_free': (redeem_free, [self.league_connection], {}),
+            'redeem_450': (redeem, [self.league_connection, 450], {}),
+            'redeem_1350': (redeem, [self.league_connection, 1350], {}),
+            'redeem_3150': (redeem, [self.league_connection, 3150], {}),
+            'redeem_4800': (redeem, [self.league_connection, 4800], {}),
+            'redeem_6300': (redeem, [self.league_connection, 6300], {}),
+            'disenchant': (disenchant, [self.league_connection], {}),
+            'buy_450': (buy_champ_by_be, [self.league_connection, 450], {}),
+            'buy_1350': (buy_champ_by_be, [self.league_connection, 1350], {}),
+            'buy_3150': (buy_champ_by_be, [self.league_connection, 3150], {}),
+            'buy_4800': (buy_champ_by_be, [self.league_connection, 4800], {}),
+            'buy_6300': (buy_champ_by_be, [self.league_connection, 6300], {}),
+            'change_icon': (change_icon, [self.league_connection, SUMMONER_ICON_ID], {}),
+        }
+
+        for option in options:
+            if option not in handlers:
+                handle_not_implemented()
+                continue
+            func = handlers[option]
+            func[0](*func[1], *func[2])
+
+        return {
+            'blue_essence': get_be(self.league_connection),
+            'owned_champions_count': get_owned_champions_count(self.league_connection),
+        }
