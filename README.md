@@ -1,8 +1,8 @@
-# auto_watch_client
-League of legends script that initializes the worlds mission in a batch
-![Demo](https://raw.githubusercontent.com/pradishb/auto_watch_client/master/demo.jpg?token=AEB67DUMOALVNZ33M6O3CVK5T54K4)
+# auto_disenchanter
+League of Legends tool to open loots, disenchant, redeem loots, buy champions in batch for multiple accounts
+![Demo](https://raw.githubusercontent.com/pradishb/auto_disenchanter/master/demo.jpg)
 # Requirements
-- python 3
+- python 3.7
 - virutalenv
 
 # Installation
