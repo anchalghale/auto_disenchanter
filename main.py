@@ -2,13 +2,15 @@
 import logging
 import threading
 import tkinter as tk
+import time
 
 import urllib3
 
 from connection.league import LeagueConnection
-from connection.riot import RiotConnection
+from connection.riot import RiotConnection, RiotConnectionException
 from file import export_csv, import_csv
 from macro import Macro
+from macro.process import open_riot_client
 from macro.exceptions import (AuthenticationFailureException,
                               ConsentRequiredException)
 from process import kill_process
@@ -20,6 +22,19 @@ urllib3.disable_warnings()
 
 OPTIONS = [
     'open_chests',
+    'redeem_free',
+    'redeem_450',
+    'redeem_1350',
+    'redeem_3150',
+    'redeem_4800',
+    'redeem_6300',
+    'disenchant',
+    'buy_450',
+    'buy_1350',
+    'buy_3150',
+    'buy_4800',
+    'buy_6300',
+    'change_icon'
 ]
 
 
@@ -27,7 +42,7 @@ class Application(Gui):
     ''' Main gui class '''
 
     def __init__(self, master):
-        Gui.__init__(self, master, 'Hello')
+        Gui.__init__(self, master, 'Auto Disenchanter')
         self.accounts = []
 
         self.init_checkboxes(OPTIONS)
@@ -40,6 +55,18 @@ class Application(Gui):
             if self.builder.get_object(option).instate(['selected']):
                 options.append(option)
         return options
+
+    def init_processes(self):
+        ''' Closes running leauge processes and initilaizes new ones '''
+        kill_process(LEAGUE_CLIENT_PROCESS)
+        kill_process(RIOT_CLIENT_PROCESS)
+        open_riot_client()
+        while True:
+            try:
+                self.macro.riot_connection.get_connection()
+                return
+            except RiotConnectionException:
+                time.sleep(1)
 
     def start(self):
         ''' Starts the macro thread '''
@@ -55,22 +82,24 @@ class Application(Gui):
         options = self.get_options()
         self.builder.get_object('start')['state'] = 'disabled'
 
-        kill_process(LEAGUE_CLIENT_PROCESS)
-        kill_process(RIOT_CLIENT_PROCESS)
         for idx, account in enumerate(self.accounts):
             tree = self.builder.get_object('accounts')
             child_id = tree.get_children()[idx]
             tree.focus(child_id)
             tree.selection_set(child_id)
-
+            self.init_processes()
             try:
-                self.macro.do_macro(options, *account)
+                response = self.macro.do_macro(options, *account)
+                self.set_cell('accounts', idx, 3, response['blue_essence'])
+                self.set_cell('accounts', idx, 4, response['owned_champions_count'])
             except AuthenticationFailureException:
                 logging.info('Account %s has invalid credentials', account[0])
             except ConsentRequiredException:
                 logging.info('Account %s needs consent', account[0])
             progress = (idx + 1) * 100 // len(self.accounts)
             self.builder.get_object('progress')['value'] = progress
+        kill_process(LEAGUE_CLIENT_PROCESS)
+        kill_process(RIOT_CLIENT_PROCESS)
         self.builder.get_object('start')['state'] = 'normal'
 
     def import_csv(self):

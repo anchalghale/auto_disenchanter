@@ -48,6 +48,11 @@ class Gui:
         tree = self.builder.get_object(name)
         tree.delete(*tree.get_children())
 
+    def set_cell(self, name, row, column, value):
+        ''' Sets the value of a specific cell of the tree view '''
+        item_id = self.builder.get_object(name).get_children()[row]
+        self.builder.get_object(name).set(item_id, '#{}'.format(column), value)
+
     def set_row(self, name, value):
         ''' Sets a row value of a treeview component '''
         self.builder.get_object(name).insert(

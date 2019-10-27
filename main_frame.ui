@@ -9,9 +9,9 @@
       <property name="row">0</property>
     </layout>
     <child>
-      <object class="tk.LabelFrame" id="disenchanter">
+      <object class="tk.LabelFrame" id="tasks">
         <property name="height">200</property>
-        <property name="text" translatable="yes">Disenchanter</property>
+        <property name="text" translatable="yes">Tasks</property>
         <property name="width">200</property>
         <layout>
           <property name="column">0</property>
@@ -176,37 +176,13 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="read_be">
-            <property name="text" translatable="yes">Read Blue Essence</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="columnspan">3</property>
-              <property name="propagate">True</property>
-              <property name="row">13</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="ttk.Checkbutton" id="read_owned">
-            <property name="text" translatable="yes">Read Number of Owned Champions</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="columnspan">3</property>
-              <property name="propagate">True</property>
-              <property name="row">14</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
           <object class="ttk.Checkbutton" id="change_icon">
             <property name="text" translatable="yes">Change Summoner Icon</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
               <property name="propagate">True</property>
-              <property name="row">15</property>
+              <property name="row">13</property>
               <property name="sticky">w</property>
             </layout>
           </object>
@@ -219,7 +195,7 @@
             <layout>
               <property name="column">0</property>
               <property name="propagate">False</property>
-              <property name="row">16</property>
+              <property name="row">14</property>
               <property name="sticky">w</property>
             </layout>
           </object>
@@ -232,7 +208,7 @@
             <layout>
               <property name="column">1</property>
               <property name="propagate">True</property>
-              <property name="row">16</property>
+              <property name="row">14</property>
             </layout>
           </object>
         </child>
@@ -244,7 +220,7 @@
             <layout>
               <property name="column">2</property>
               <property name="propagate">True</property>
-              <property name="row">16</property>
+              <property name="row">14</property>
               <property name="sticky">nw</property>
             </layout>
           </object>
