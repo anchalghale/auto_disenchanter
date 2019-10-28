@@ -93,7 +93,6 @@ class Application(Gui):
             try:
                 response = self.macro.do_macro(options, *account)
                 self.set_cell('accounts', idx, 3, response['blue_essence'])
-                self.set_cell('accounts', idx, 4, response['owned_champions_count'])
             except AuthenticationFailureException:
                 logging.info('Account %s has invalid credentials', account[0])
             except ConsentRequiredException:

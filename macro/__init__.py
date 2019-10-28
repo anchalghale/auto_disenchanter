@@ -22,7 +22,7 @@ from .chest import forge_keys_and_open_generic_chests, forge_worlds_token
 from .process import open_league_client, open_riot_client
 from .account import (
     accept_agreement, check_riot_session, check_session, login, logout,
-    set_summoner_name, get_be, get_owned_champions_count)
+    set_summoner_name, get_be)
 from .exceptions import (
     AccountBannedException, AuthenticationFailureException,
     BadUsernameException, ConsentRequiredException, RateLimitedException)
@@ -86,5 +86,4 @@ class Macro:
 
         return {
             'blue_essence': get_be(self.league_connection),
-            'owned_champions_count': get_owned_champions_count(self.league_connection),
         }
