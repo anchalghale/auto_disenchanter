@@ -1,7 +1,9 @@
 ''' Module for chest related tasks '''
 import logging
+import time
 
 from .loot import get_loot
+from .exceptions import LootRetrieveException
 
 
 def get_player_loot_map(connection):
@@ -80,7 +82,11 @@ def open_generic_chests(connection, repeat=1):
 def forge_keys_and_open_generic_chests(connection):
     ''' Forges all key fragments and opens all generic chests '''
     while True:
-        loot_json = get_loot(connection)
+        try:
+            loot_json = get_loot(connection)
+        except LootRetrieveException:
+            time.sleep(1)
+            continue
         forgable_keys = get_key_fragment_count(loot_json)//3
         key_count = get_key_count(loot_json)
         generic_chest_count = get_generic_chest_count(loot_json)
@@ -96,7 +102,11 @@ def forge_keys_and_open_generic_chests(connection):
 def forge_worlds_token(connection):
     ''' Forges all key fragments and opens all generic chests '''
     while True:
-        loot_json = get_loot(connection)
+        try:
+            loot_json = get_loot(connection)
+        except LootRetrieveException:
+            time.sleep(1)
+            continue
         worlds_token_count = get_worlds_token_count(loot_json)
         forgable_champion_shards = worlds_token_count//50
         if forgable_champion_shards == 0:
