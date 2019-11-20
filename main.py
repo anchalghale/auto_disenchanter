@@ -1,21 +1,17 @@
 ''' Main script of the program '''
+import asyncio
 import logging
 import threading
 import tkinter as tk
-import time
-
+import types
 import urllib3
 
-from connection.league import LeagueConnection
-from connection.riot import RiotConnection, RiotConnectionException
 from file import export_csv, import_csv
 from macro import Macro
-from macro.process import open_riot_client
-from macro.exceptions import (AuthenticationFailureException,
-                              ConsentRequiredException)
-from process import kill_process
-from settings import LEAGUE_CLIENT_PROCESS, RIOT_CLIENT_PROCESS
+from client.exceptions import AuthenticationFailureException, ConsentRequiredException
+from settings import get_settings
 from gui import Gui
+from gui.logger import Logger
 
 logging.getLogger().setLevel(logging.INFO)
 urllib3.disable_warnings()
@@ -48,7 +44,9 @@ class Application(Gui):
         self.accounts = []
 
         self.init_checkboxes(OPTIONS)
-        self.macro = Macro(RiotConnection(), LeagueConnection())
+        self.settings = get_settings()
+        self.logger = Logger(self.builder, self.settings.log_time_format)
+        self.macro = Macro(self.logger, self.settings)
 
     def get_options(self):
         ''' Returns a list of options from checkboxes '''
@@ -58,28 +56,18 @@ class Application(Gui):
                 options.append(option)
         return options
 
-    def init_processes(self):
-        ''' Closes running leauge processes and initilaizes new ones '''
-        kill_process(LEAGUE_CLIENT_PROCESS)
-        kill_process(RIOT_CLIENT_PROCESS)
-        open_riot_client()
-        while True:
-            try:
-                self.macro.riot_connection.get_connection()
-                return
-            except RiotConnectionException:
-                time.sleep(1)
-
     def start(self):
         ''' Starts the macro thread '''
         if self.accounts == []:
             logging.error('No accounts imported')
             return
-        thread = threading.Thread(target=self.start_macro)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        thread = threading.Thread(target=loop.run_until_complete, args=[self.start_macro()])
         thread.daemon = True
         thread.start()
 
-    def start_macro(self):
+    async def start_macro(self):
         ''' Starts the main batch process '''
         options = self.get_options()
         self.builder.get_object('start')['state'] = 'disabled'
@@ -89,9 +77,11 @@ class Application(Gui):
             child_id = tree.get_children()[idx]
             tree.focus(child_id)
             tree.selection_set(child_id)
-            self.init_processes()
             try:
-                response = self.macro.do_macro(options, *account)
+                account_ = types.SimpleNamespace(
+                    username=account[0], password=account[1],
+                    region=self.settings.region, locale=self.settings.locale)
+                response = await self.macro.do_macro(options, account_)
                 self.set_cell('accounts', idx, 3, response['blue_essence'])
             except AuthenticationFailureException:
                 logging.info('Account %s has invalid credentials', account[0])
@@ -99,8 +89,6 @@ class Application(Gui):
                 logging.info('Account %s needs consent', account[0])
             progress = (idx + 1) * 100 // len(self.accounts)
             self.builder.get_object('progress')['value'] = progress
-        kill_process(LEAGUE_CLIENT_PROCESS)
-        kill_process(RIOT_CLIENT_PROCESS)
         self.builder.get_object('start')['state'] = 'normal'
 
     def import_csv(self):

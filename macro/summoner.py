@@ -1,29 +1,22 @@
-''' Module for summoner related tasks '''
-import logging
+''' Macro module for summoner related macros '''
 import time
 
-import requests
+from client.account import get_username
+from client.exceptions import AccountChangeNeededException
+
+from utils import naturaldelta
 
 
-def change_icon(connection, icon_id):
-    ''' Changes the summoner icon '''
-    while get_icon(connection) != icon_id:
-        json = {
-            "profileIconId": icon_id
-        }
-        try:
-            logging.info("Changing summoner icon")
-            connection.put('/lol-summoner/v1/current-summoner/icon', json=json)
-        except requests.RequestException:
-            pass
-        time.sleep(1)
+async def check_username_macro(logger, connection, username):
+    ''' Checks if the current logged in account is correct '''
+    checkpoint_time = time.time()
+    logger.log('Getting username')
+    username_client = await get_username(connection)
+    while username_client is None or username_client == '':
+        username_client = await get_username(connection)
 
+    if username.lower() != username_client.lower():
+        logger.log(f'Expected username: {username.lower()}. Current username: {username_client.lower()}')
+        raise AccountChangeNeededException
 
-def get_icon(connection):
-    ''' Parses the current summoner icon '''
-    try:
-        res = connection.get('/lol-summoner/v1/current-summoner')
-        res_json = res.json()
-        return res_json["profileIconId"]
-    except requests.RequestException:
-        return -1
+    logger.log('Got username, took {}'.format(naturaldelta(time.time() - checkpoint_time)))

@@ -1,16 +1,8 @@
-''' Module for loot related tasks '''
-import logging
+''' Macro module for store related macros '''
+from client.store import catalog
 
 
-def catalog(connection, item_type):
-    ''' Parses the item catalog for a item type '''
-    logging.info("Getting store item catalog for type %s", item_type)
-    url = '/lol-store/v1/catalog?inventoryType=["%s"]' % item_type
-    res = connection.get(url)
-    return res.json()
-
-
-def buy(connection, name, item_id, val):
+def buy(connection, item_id, val):
     ''' Buys a specific item from the store '''
     data = {
         "items": [
@@ -28,25 +20,28 @@ def buy(connection, name, item_id, val):
             }
         ]
     }
-    logging.info("Buying %s", name)
     res = connection.post('/lol-purchase-widget/v1/purchaseItems', json=data)
     res_json = res.json()
     if res.status_code == 200:
         return "success"
-    return res_json["errorDetails"].popitem()[0]
+    return res_json["errorDetails"].popitem()[0] if 'errorDetails' in res_json else 'error'
 
 
-def buy_champ_by_be(connection, blue_essence):
+def buy_champ_by_be(logger, connection, blue_essence):
     ''' Buys all the champions of specific blue essence value '''
-    logging.info("Getting champions at costs %d BE", blue_essence)
+    logger.log(f"Getting champions at costs {blue_essence} BE")
     res_json = catalog(connection, "CHAMPION")
     filtered = list(filter(lambda m: m["prices"][0]["cost"] == blue_essence, res_json))
     for champ in filtered:
         name = champ["localizations"]["en_GB"]["name"]
-        result = buy(connection, name, champ["itemId"], champ["prices"][0]["cost"])
+        logger.log(f'Buying {name}...')
+        result = buy(connection, champ["itemId"], champ["prices"][0]["cost"])
+        if result == "error":
+            logger.log("Error buying champion.")
+            continue
         if result == "validation.item.owned":
-            logging.info("Champion already owned")
+            logger.log("Champion already owned")
             continue
         if result == "validation.item.not.enough.currency":
-            logging.info("Not enough BE to buy champion")
+            logger.log("Not enough BE to buy champion")
             break
