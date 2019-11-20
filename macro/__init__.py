@@ -83,7 +83,7 @@ class Macro:
                 start_time = time.time()
                 get_riot_connection_macro(self.logger, self.riot_connection, self.settings)
                 login_macro(self.logger, self.riot_connection, account)
-                get_league_connection_macro(self.logger, self.league_connection)
+                get_league_connection_macro(self.logger, self.league_connection, self.settings)
                 await check_session_macro(self.logger, self.league_connection, account)
                 await check_username_macro(self.logger, self.league_connection, account.username)
                 total_time = time.time() - start_time

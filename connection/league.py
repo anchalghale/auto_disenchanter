@@ -7,6 +7,8 @@ import json
 import lcu_connector_python as lcu
 import requests
 
+from league_process import open_league_client
+
 from . import Connection
 
 
@@ -36,10 +38,11 @@ class LeagueConnection(Connection):
         except (requests.RequestException, KeyError, json.decoder.JSONDecodeError):
             raise LeagueConnectionException
 
-    def get_connection_ft(self):
+    def get_connection_ft(self, settings):
         ''' Parses connection url and port from lockfile fault tolerant version '''
         for _ in range(self.settings.connection_retry_count):
             try:
+                open_league_client(settings)
                 self.get_connection()
                 return
             except (LeagueConnectionException, OSError):

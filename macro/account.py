@@ -28,11 +28,11 @@ def get_riot_connection_macro(logger, connection, settings):
         naturaldelta(time.time() - checkpoint_time)))
 
 
-def get_league_connection_macro(logger, connection):
+def get_league_connection_macro(logger, connection, settings):
     ''' Parses connection url and port from lockfile of leagu client '''
     checkpoint_time = time.time()
     logger.log('Getting league client connection')
-    connection.get_connection_ft()
+    connection.get_connection_ft(settings)
     logger.log('League client connection established, took {}'.format(
         naturaldelta(time.time() - checkpoint_time)))
 
