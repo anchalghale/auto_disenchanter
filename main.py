@@ -83,6 +83,7 @@ class Application(Gui):
                     region=self.settings.region, locale=self.settings.locale)
                 response = await self.macro.do_macro(options, account_)
                 self.set_cell('accounts', idx, 3, response['blue_essence'])
+                self.accounts[idx].append(response['blue_essence'])
             except AuthenticationFailureException:
                 logging.info('Account %s has invalid credentials', account[0])
             except ConsentRequiredException:
