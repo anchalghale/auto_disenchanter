@@ -9,6 +9,7 @@ import urllib3
 from file import export_csv, import_csv
 from file.pickle import save_state, load_state, create_directories
 from macro import Macro
+from updater import update
 from client.exceptions import AuthenticationFailureException, ConsentRequiredException
 from settings import get_settings
 from gui import Gui
@@ -100,6 +101,11 @@ class Application(Gui):
         ''' Starts the main batch process '''
         options = self.get_selected_options()
         self.builder.get_object('start')['state'] = 'disabled'
+        save_state({
+            'options': self.get_options(),
+            'accounts': self.accounts,
+        })
+        update(self.logger)
 
         for idx, account in enumerate(self.accounts):
             if len(account) == 2:
