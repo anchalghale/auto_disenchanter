@@ -81,7 +81,7 @@ def open_generic_chests(connection, repeat=1):
 
 def forge_keys_and_open_generic_chests(connection):
     ''' Forges all key fragments and opens all generic chests '''
-    while True:
+    for _ in range(10):
         try:
             loot_json = get_loot(connection)
         except LootRetrieveException:
@@ -97,11 +97,12 @@ def forge_keys_and_open_generic_chests(connection):
             continue
         if min(key_count, generic_chest_count) > 0:
             open_generic_chests(connection)
+    raise LootRetrieveException
 
 
 def forge_worlds_token(connection):
     ''' Forges all key fragments and opens all generic chests '''
-    while True:
+    for _ in range(10):
         try:
             loot_json = get_loot(connection)
         except LootRetrieveException:
@@ -112,3 +113,4 @@ def forge_worlds_token(connection):
         if forgable_champion_shards == 0:
             return
         forge_champion_from_worlds_token(connection, forgable_champion_shards)
+    raise LootRetrieveException
