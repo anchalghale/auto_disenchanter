@@ -10,6 +10,7 @@ from file import export_csv, import_csv
 from file.pickle import save_state, load_state, create_directories
 from macro import Macro
 from updater import update
+from incidents import Incidents
 from client.exceptions import AuthenticationFailureException, ConsentRequiredException
 from settings import get_settings
 from gui import Gui
@@ -47,6 +48,9 @@ class Application(Gui):
         self.settings = get_settings()
         self.logger = Logger(self.builder, self.settings.log_time_format)
         self.macro = Macro(self.logger, self.settings)
+
+        self.incidents = Incidents(self.logger, self.settings)
+        self.incidents.start_thread()
 
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
         state = load_state()

@@ -29,10 +29,15 @@ class Logger:
         self.builder = builder
         self.log_format = log_format
 
+    def widget_exists(self, name):
+        ''' Checks if a widget exists '''
+        return name in self.builder.objects
+
     def set_entry(self, name, value):
         ''' Sets value of entry component '''
-        self.builder.get_object(name).delete(0, tk.END)
-        self.builder.get_object(name).insert(0, str(value))
+        if self.widget_exists(name):
+            self.builder.get_object(name).delete(0, tk.END)
+            self.builder.get_object(name).insert(0, str(value))
 
     def write_line(self, name, value):
         ''' Writes a line to a textbox '''
