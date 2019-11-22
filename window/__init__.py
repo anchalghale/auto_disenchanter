@@ -3,8 +3,11 @@ import ctypes
 from ctypes import wintypes
 from collections import namedtuple
 
-USER32 = ctypes.WinDLL('user32', use_last_error=True)
+import win32con
+import win32gui
 
+
+USER32 = ctypes.WinDLL('user32', use_last_error=True)
 
 WindowInfo = namedtuple('WindowInfo', 'pid title')
 
@@ -31,3 +34,21 @@ def get_windows():
         return True
     USER32.EnumWindows(enum_proc_cb, 0)
     return sorted(result)
+
+
+def get_window_handle(title):
+    ''' Returns the handle of the window '''
+    try:
+        return win32gui.FindWindow(None, title)
+    except win32gui.error:
+        return None
+
+
+def close_window(title):
+    ''' Finds and closes a window with a title '''
+    try:
+        handle = get_window_handle(title)
+        if handle is not None:
+            win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
+    except win32gui.error:
+        pass

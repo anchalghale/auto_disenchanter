@@ -2,7 +2,7 @@
 import time
 import threading
 
-from window import get_windows
+from window import get_windows, close_window
 from league_process import kill_game, kill_league_client
 from process import is_running, kill_process
 from gui.logger import Logger
@@ -20,7 +20,11 @@ GAME_ERROR_TITLES = [
 LEAGUE_CLIENT_ERROR_TITLES = [
     'Error',
     'LeagueClient.exe - Entry Point Not Found',
+]
+
+CSRSS_ERROR_TITILES = [
     'LeagueClient.exe - Application Error',
+    'League of Legends.exe - Application Error',
 ]
 
 
@@ -43,6 +47,12 @@ class Incidents:
         ''' Sets the incidents count entry in the gui '''
         self.logger.set_entry('incidents_count', self.count)
 
+    def increment_count(self):
+        ''' Sets the incidents count by one '''
+        self.count += 1
+        self.logger.set_entry('incidents_count', self.count)
+        time.sleep(1)
+
     def check_incidents(self):
         ''' Checks for incidents and handles it forever '''
         while True:
@@ -51,22 +61,22 @@ class Incidents:
                 if title in window_list:
                     self.logger.log(
                         f'Bad window title found: {title}. Killing League of Legends.exe...')
-                    self.count += 1
-                    self.logger.set_entry('incidents_count', self.count)
-                    time.sleep(1)
+                    self.increment_count()
                     kill_game(self.settings)
             for title in LEAGUE_CLIENT_ERROR_TITLES:
                 if title in window_list:
                     self.logger.log(
                         f'Bad window title found: {title}. Killing LeagueClient.exe...')
-                    self.count += 1
-                    self.logger.set_entry('incidents_count', self.count)
-                    time.sleep(1)
+                    self.increment_count()
                     kill_league_client(self.settings)
+            for title in CSRSS_ERROR_TITILES:
+                if title in window_list:
+                    self.logger.log(
+                        f'Bad window title found: {title}. Closing the {title} window...')
+                    self.increment_count()
+                    close_window(title)
             if is_running(self.settings.bug_splat_process):
                 self.logger.log(f'BugSplat found, killing {self.settings.bug_splat_process}')
-                self.count += 1
-                self.logger.set_entry('incidents_count', self.count)
-                time.sleep(1)
+                self.increment_count()
                 kill_process(self.settings.bug_splat_process)
             time.sleep(5)
