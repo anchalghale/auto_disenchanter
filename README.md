@@ -10,7 +10,12 @@ Create a virutalenv
 ```
 virtualenv venv
 ```
-Activate the virutalenv and install the dependencies using
+Activate the virutalenv 
+- Windows
+```
+venv\Scripts\activate
+```
+Install the dependencies using
 ```
 pip install -r requirements.txt
 ```
