@@ -54,6 +54,7 @@ class Logger:
 
     def set_treeview(self, name, values):
         ''' Sets value of whole treeview component '''
+        self.clear_treeview(name)
         for value in values:
             self.insert_row(name, value)
 
@@ -61,6 +62,11 @@ class Logger:
         ''' Clears the values of treeview component '''
         tree = self.builder.get_object(name)
         tree.delete(*tree.get_children())
+
+    def init_checkboxes(self, options):
+        ''' Checks all the checkboxes at the start '''
+        for option, value in options.items():
+            self.init_checkbox(option, value)
 
     def init_checkbox(self, name, value):
         ''' Initializes a checkbox component using boolean value '''
@@ -74,3 +80,8 @@ class Logger:
         ''' Sets the state of a list of button components '''
         for button in buttons:
             self.builder.get_object(button)['state'] = state
+
+    def set_row(self, name, value):
+        ''' Sets a row value of a treeview component '''
+        self.builder.get_object(name).insert(
+            '', 'end', values=value)

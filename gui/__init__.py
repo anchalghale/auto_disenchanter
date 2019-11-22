@@ -23,7 +23,7 @@ class Gui:
     ''' Main gui class '''
 
     def __init__(self, master, title):
-        LogWriter(self)
+        # LogWriter(self)
         import pygubu       # pylint:disable=import-outside-toplevel
 
         self.master = master
@@ -32,41 +32,3 @@ class Gui:
         self.builder.add_from_file('main_frame.ui')
         self.mainwindow = builder.get_object('main_frame', master)
         self.builder.connect_callbacks(self)
-
-    def init_checkboxes(self, options):
-        ''' Checks all the checkboxes at the start '''
-        for option in options:
-            self.init_checkbox(option, True)
-
-    def set_treeview(self, name, values):
-        ''' Sets the treeview component '''
-        for value in values:
-            self.set_row(name, value)
-
-    def clear_treeview(self, name):
-        ''' Clears the treeview component '''
-        tree = self.builder.get_object(name)
-        tree.delete(*tree.get_children())
-
-    def set_cell(self, name, row, column, value):
-        ''' Sets the value of a specific cell of the tree view '''
-        item_id = self.builder.get_object(name).get_children()[row]
-        self.builder.get_object(name).set(item_id, '#{}'.format(column), value)
-
-    def set_row(self, name, value):
-        ''' Sets a row value of a treeview component '''
-        self.builder.get_object(name).insert(
-            '', 'end', values=value)
-
-    def init_checkbox(self, name, value):
-        ''' Intializes a checkout component '''
-        self.builder.get_object(name).state(['!alternate'])
-        if value:
-            self.builder.get_object(name).state(['selected'])
-        else:
-            self.builder.get_object(name).state(['!selected'])
-
-    def write_console(self, text):
-        ''' Writes the messages to console textbox component '''
-        self.builder.get_object('console').insert(tk.END, text)
-        self.builder.get_object('console').see('end')

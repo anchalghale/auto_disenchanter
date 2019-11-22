@@ -9,7 +9,7 @@ def import_csv():
     file = filedialog.askopenfile("r")
 
     if file is None:
-        return []
+        return None
     accounts = []
     reader = csv.reader(file, delimiter=":")
     for row in reader:
