@@ -35,6 +35,9 @@ def kill_league_client(settings):
 def kill_riot_client(settings):
     ''' Kills the riot client '''
     kill_process(settings.riot_client_process)
+    kill_process(settings.riot_client_crash_handler_process)
+    kill_process(settings.riot_client_ux_process)
+    kill_process(settings.riot_client_ux_render_process)
 
 
 def kill_game(settings):

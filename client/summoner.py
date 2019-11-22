@@ -72,7 +72,6 @@ async def get_tutorial_status(logger: Logger, connection: LeagueConnection):
         res = future.result()
         res_json = res.json()
         if res_json == []:
-            print('tutorial retrieve failed')
             await init_tutorial(logger, connection)
             await asyncio.sleep(1)
             continue

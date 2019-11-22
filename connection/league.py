@@ -19,9 +19,9 @@ class LeagueConnectionException(Exception):
 class LeagueConnection(Connection):
     ''' Connects to league client and communicates with it '''
 
-    def get_connection(self):
+    def get_connection(self, settings):
         ''' Parses connection url and port from lockfile '''
-        connection = lcu.connect(os.path.expanduser(self.settings.league_client_path))
+        connection = lcu.connect(os.path.expanduser(settings.league_client_path))
         if connection == 'Ensure the client is running and that you supplied the correct path':
             raise LeagueConnectionException
         self.kwargs = {
@@ -40,10 +40,10 @@ class LeagueConnection(Connection):
 
     def get_connection_ft(self, settings):
         ''' Parses connection url and port from lockfile fault tolerant version '''
-        for _ in range(self.settings.connection_retry_count):
+        for _ in range(settings.connection_retry_count):
             try:
                 open_league_client(settings)
-                self.get_connection()
+                self.get_connection(settings)
                 return
             except (LeagueConnectionException, OSError):
                 time.sleep(1)

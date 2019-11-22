@@ -17,10 +17,10 @@ class RiotConnectionException(Exception):
 class RiotConnection(Connection):
     ''' Connects to riot client and communicates with it '''
 
-    def get_connection(self):
+    def get_connection(self, settings):
         ''' Parses connection url and port from lockfile '''
         try:
-            connection = lcu.connect(os.path.expanduser(self.settings.riot_client_config))
+            connection = lcu.connect(os.path.expanduser(settings.riot_client_config))
         except IndexError:
             raise RiotConnectionException
         if connection == 'Ensure the client is running and that you supplied the correct path':
@@ -38,10 +38,10 @@ class RiotConnection(Connection):
 
     def get_connection_ft(self, settings):
         ''' Parses connection url and port from lockfile fault tolerant version '''
-        for _ in range(self.settings.connection_retry_count):
+        for _ in range(settings.connection_retry_count):
             try:
                 open_riot_client(settings)
-                self.get_connection()
+                self.get_connection(settings)
                 return
             except (RiotConnectionException, OSError):
                 time.sleep(1)

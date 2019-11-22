@@ -9,13 +9,12 @@ import requests
 class Connection:
     ''' Connects to league client and communicates with it '''
 
-    def __init__(self, settings):
-        self.settings = settings
+    def __init__(self):
         self.kwargs = None
         self.url = None
         self.session = FuturesSession()
 
-    def get_connection(self):
+    def get_connection(self, settings):
         ''' Parses connection url and port from lockfile '''
         raise NotImplementedError('Please implement this method')
 

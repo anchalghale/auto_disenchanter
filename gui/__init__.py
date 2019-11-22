@@ -1,5 +1,4 @@
 ''' Main script of the program '''
-import logging
 import sys
 import threading
 import tkinter as tk

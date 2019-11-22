@@ -4,8 +4,9 @@ import logging
 import threading
 import tkinter as tk
 import types
-import urllib3
 import subprocess
+
+import urllib3
 
 from file import export_csv, import_csv
 from file.pickle import save_state, load_state, create_directories
@@ -13,7 +14,7 @@ from macro import Macro
 from updater import update
 from incidents import Incidents
 from client.exceptions import AuthenticationFailureException, ConsentRequiredException
-from settings import get_settings
+from settings_local import get_settings
 from gui import Gui
 from gui.logger import Logger
 

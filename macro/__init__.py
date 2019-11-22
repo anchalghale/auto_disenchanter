@@ -40,8 +40,8 @@ class Macro:
     def __init__(self, logger, settings):
         self.settings = settings
         self.logger = logger
-        self.riot_connection = RiotConnection(self.settings)
-        self.league_connection = LeagueConnection(self.settings)
+        self.riot_connection = RiotConnection()
+        self.league_connection = LeagueConnection()
 
         self.state = None
 
