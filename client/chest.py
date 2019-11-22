@@ -1,6 +1,7 @@
 ''' Module for chest related tasks '''
-import logging
 import time
+
+from gui.logger import Logger
 
 from .loot import get_loot
 from .exceptions import LootRetrieveException
@@ -49,41 +50,41 @@ def get_generic_chest_count(loot_json):
     return generic_chest[0]['count']
 
 
-def forge(connection, repeat=1):
+def forge(logger: Logger, connection, repeat=1):
     ''' Forges key fragment to keys '''
     if repeat == 0:
         return
-    logging.info('Forging %d keys', repeat)
+    logger.log(f'Forging {repeat} keys')
     connection.post(
         '/lol-loot/v1/recipes/MATERIAL_key_fragment_forge/craft?repeat={}'.format(
             repeat), json=['MATERIAL_key_fragment'])
 
 
-def forge_champion_from_worlds_token(connection, repeat=1):
+def forge_champion_from_worlds_token(logger: Logger, connection, repeat=1):
     ''' Forges key fragment to keys '''
     if repeat == 0:
         return
-    logging.info('Forging %d champion shards from worlds token', repeat)
+    logger.log(f'Forging {repeat} champion shards from worlds token')
     connection.post(
         '/lol-loot/v1/recipes/MATERIAL_337_FORGE_33/craft?repeat={}'.format(
             repeat), json=['MATERIAL_337'])
 
 
-def open_generic_chests(connection, repeat=1):
+def open_generic_chests(logger: Logger, connection, repeat=1):
     ''' Opens a chest and saves it data to json '''
     if repeat == 0:
         return
-    logging.info('Opening %d generic chests', repeat)
+    logger.log(f'Opening {repeat} generic chests')
     connection.post(
         '/lol-loot/v1/recipes/CHEST_generic_OPEN/craft?repeat={}'.format(
             repeat), json=['CHEST_generic', 'MATERIAL_key'])
 
 
-def forge_keys_and_open_generic_chests(connection):
+def forge_keys_and_open_generic_chests(logger: Logger, connection):
     ''' Forges all key fragments and opens all generic chests '''
     for _ in range(10):
         try:
-            loot_json = get_loot(connection)
+            loot_json = get_loot(logger, connection)
         except LootRetrieveException:
             time.sleep(1)
             continue
@@ -93,18 +94,18 @@ def forge_keys_and_open_generic_chests(connection):
         if (forgable_keys == 0 and key_count == 0) or generic_chest_count == 0:
             return
         if forgable_keys > 0:
-            forge(connection, forgable_keys)
+            forge(logger, connection, forgable_keys)
             continue
         if min(key_count, generic_chest_count) > 0:
-            open_generic_chests(connection)
+            open_generic_chests(logger, connection)
     raise LootRetrieveException
 
 
-def forge_worlds_token(connection):
+def forge_worlds_token(logger: Logger, connection):
     ''' Forges all key fragments and opens all generic chests '''
     for _ in range(10):
         try:
-            loot_json = get_loot(connection)
+            loot_json = get_loot(logger, connection)
         except LootRetrieveException:
             time.sleep(1)
             continue
@@ -112,5 +113,5 @@ def forge_worlds_token(connection):
         forgable_champion_shards = worlds_token_count//50
         if forgable_champion_shards == 0:
             return
-        forge_champion_from_worlds_token(connection, forgable_champion_shards)
+        forge_champion_from_worlds_token(logger, connection, forgable_champion_shards)
     raise LootRetrieveException

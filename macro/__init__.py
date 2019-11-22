@@ -16,16 +16,17 @@ from process import is_running
 from utils import naturaldelta
 
 from league_process import kill_league_client, kill_riot_client
-from client.exceptions import AccountChangeNeededException, LogoutNeededException, NoSessionException, LootRetrieveException
 from client.summoner import change_icon
 from client.loot import open_champion_capsules, redeem, redeem_free, disenchant
 from client.chest import forge_keys_and_open_generic_chests, forge_worlds_token
 from client.summoner import get_blue_essence
+from client.exceptions import (AccountChangeNeededException,
+                               LogoutNeededException, NoSessionException, LootRetrieveException)
 
-from .account import (login_macro, get_riot_connection_macro, get_league_connection_macro,
-                      check_session_macro, patch_data_macro)
 from .summoner import check_username_macro
 from .store import buy_champ_by_be
+from .account import (login_macro, get_riot_connection_macro, get_league_connection_macro,
+                      check_session_macro)
 
 
 def handle_not_implemented():
@@ -46,23 +47,24 @@ class Macro:
 
     async def handle_disenchant_tasks(self, options):
         ''' Handles disenchanting tasks '''
+        state = [self.logger, self.league_connection]
         handlers = {
-            'open_champion_capsules': (open_champion_capsules, [self.league_connection], {}),
-            'open_generic_chests': (forge_keys_and_open_generic_chests, [self.league_connection], {}),
-            'forge_worlds_token': (forge_worlds_token, [self.league_connection], {}),
-            'redeem_free': (redeem_free, [self.league_connection], {}),
-            'redeem_450': (redeem, [self.league_connection, 450], {}),
-            'redeem_1350': (redeem, [self.league_connection, 1350], {}),
-            'redeem_3150': (redeem, [self.league_connection, 3150], {}),
-            'redeem_4800': (redeem, [self.league_connection, 4800], {}),
-            'redeem_6300': (redeem, [self.league_connection, 6300], {}),
-            'disenchant': (disenchant, [self.league_connection], {}),
-            'buy_450': (buy_champ_by_be, [self.logger, self.league_connection, 450], {}),
-            'buy_1350': (buy_champ_by_be, [self.logger, self.league_connection, 1350], {}),
-            'buy_3150': (buy_champ_by_be, [self.logger, self.league_connection, 3150], {}),
-            'buy_4800': (buy_champ_by_be, [self.logger, self.league_connection, 4800], {}),
-            'buy_6300': (buy_champ_by_be, [self.logger, self.league_connection, 6300], {}),
-            'change_icon': (change_icon, [self.league_connection, self.settings.summoner_icon_id], {}),
+            'open_champion_capsules': (open_champion_capsules, state, {}),
+            'open_generic_chests': (forge_keys_and_open_generic_chests, state, {}),
+            'forge_worlds_token': (forge_worlds_token, state, {}),
+            'redeem_free': (redeem_free, state, {}),
+            'redeem_450': (redeem, [*state, 450], {}),
+            'redeem_1350': (redeem, [*state, 1350], {}),
+            'redeem_3150': (redeem, [*state, 3150], {}),
+            'redeem_4800': (redeem, [*state, 4800], {}),
+            'redeem_6300': (redeem, [*state, 6300], {}),
+            'disenchant': (disenchant, state, {}),
+            'buy_450': (buy_champ_by_be, [*state, 450], {}),
+            'buy_1350': (buy_champ_by_be, [*state, 1350], {}),
+            'buy_3150': (buy_champ_by_be, [*state, 3150], {}),
+            'buy_4800': (buy_champ_by_be, [*state, 4800], {}),
+            'buy_6300': (buy_champ_by_be, [*state, 6300], {}),
+            'change_icon': (change_icon, [*state, self.settings.summoner_icon_id], {}),
         }
 
         for option in options:

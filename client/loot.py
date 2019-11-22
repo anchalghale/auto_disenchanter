@@ -1,35 +1,35 @@
 ''' Module for loot related tasks '''
-import logging
 import re
 import time
+
+from gui.logger import Logger
+
 from .exceptions import LootRetrieveException
 
 
-def get_loot(connection):
+def get_loot(logger: Logger, connection):
     ''' Parses the loot data '''
     res = connection.get('/lol-loot/v1/player-loot')
     res_json = res.json()
     if res_json == []:
-        logging.error("Can't retrieve loot")
+        logger.log("Can't retrieve loot")
         raise LootRetrieveException
     return res_json
 
 
-def process_redeem(connection, array):
+def process_redeem(logger: Logger, connection, array):
     ''' Does the redeeming task '''
     for loot in array:
-        logging.info("Redeeming: %s, Count: %d",
-                     loot["itemDesc"], loot["count"])
-        connection.post("/lol-loot/v1/player-loot/%s/redeem" %
-                        loot["lootName"])
+        logger.log(f'Redeeming: {loot["itemDesc"]}, Count: {loot["count"]}')
+        connection.post('/lol-loot/v1/player-loot/%s/redeem' % loot['lootName'])
 
 
-def redeem_free(connection):
+def redeem_free(logger: Logger, connection):
     ''' Redeems all the free champion shards '''
-    logging.info("Redeeming free shards")
+    logger.log("Redeeming free shards")
     for _ in range(10):
         try:
-            res_json = get_loot(connection)
+            res_json = get_loot(logger, connection)
         except LootRetrieveException:
             time.sleep(1)
             continue
@@ -42,16 +42,16 @@ def redeem_free(connection):
             ), res_json))
         if loot_result == []:
             return
-        process_redeem(connection, loot_result)
+        process_redeem(logger, connection, loot_result)
     raise LootRetrieveException
 
 
-def redeem(connection, value):
+def redeem(logger, connection, value):
     ''' Redeems all the champion shards of a specific value '''
-    logging.info("Redeeming %d BE shards", value)
+    logger.log(f"Redeeming {value} BE shards")
     for _ in range(10):
         try:
-            res_json = get_loot(connection)
+            res_json = get_loot(logger, connection)
         except LootRetrieveException:
             time.sleep(1)
             continue
@@ -64,16 +64,16 @@ def redeem(connection, value):
 
         if loot_result == []:
             return
-        process_redeem(connection, loot_result)
+        process_redeem(logger, connection, loot_result)
     raise LootRetrieveException
 
 
-def open_champion_capsules(connection):
+def open_champion_capsules(logger: Logger, connection):
     ''' Opens  all champion capsules '''
-    logging.info("Opening all champion capsules")
+    logger.log("Opening all champion capsules")
     for _ in range(10):
         try:
-            res_json = get_loot(connection)
+            res_json = get_loot(logger, connection)
         except LootRetrieveException:
             time.sleep(1)
             continue
@@ -83,8 +83,7 @@ def open_champion_capsules(connection):
             return
 
         for loot in loot_result:
-            logging.info(
-                "Opening chest: %s, Count: %d", loot["lootName"], loot["count"])
+            logger.log(f'Opening chest: {loot["lootName"]}, Count: {loot["count"]}')
             url = "/lol-loot/v1/recipes/%s_OPEN/craft?repeat=%d" % (
                 loot["lootName"], loot["count"])
             data = [loot["lootName"]]
@@ -92,12 +91,12 @@ def open_champion_capsules(connection):
     raise LootRetrieveException
 
 
-def disenchant(connection):
+def disenchant(logger: Logger, connection):
     ''' Disenchants the champion shards '''
-    logging.info("Disenchanting all champion shards")
+    logger.log("Disenchanting all champion shards")
     for _ in range(10):
         try:
-            res_json = get_loot(connection)
+            res_json = get_loot(logger, connection)
         except LootRetrieveException:
             time.sleep(1)
             continue
@@ -108,8 +107,7 @@ def disenchant(connection):
             return
 
         for loot in loot_result:
-            logging.info(
-                "Dienchanting: %s, Count: %d", loot["itemDesc"], loot["count"])
+            logger.log(f'Dienchanting: {loot["itemDesc"]}, Count: {loot["count"]}')
             url = "/lol-loot/v1/recipes/%s_disenchant/craft?repeat=%d" % (
                 loot["type"], loot["count"])
             data = [loot["lootName"]]

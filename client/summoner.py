@@ -1,23 +1,23 @@
 ''' Module for summoner related tasks '''
-import logging
 import time
 import asyncio
 
 import requests
 
 from connection.league import LeagueConnection
+from gui.logger import Logger
 
 from .exceptions import BadUsernameException
 
 
-def change_icon(connection: LeagueConnection, icon_id):
+def change_icon(logger: Logger, connection: LeagueConnection, icon_id):
     ''' Changes the summoner icon '''
     while get_icon(connection) != icon_id:
         json = {
             'profileIconId': icon_id
         }
         try:
-            logging.info("Changing summoner icon")
+            logger.log("Changing summoner icon")
             connection.put('/lol-summoner/v1/current-summoner/icon', json=json)
         except requests.RequestException:
             pass
@@ -39,11 +39,11 @@ async def get_summoner_data(connection: LeagueConnection):
     future = connection.async_get('/lol-summoner/v1/current-summoner')
     await asyncio.sleep(1)
     res = future.result()
-    res_json = res.json()
+    json_ = res.json()
     return (
-        res_json['summonerLevel'] if 'summonerLevel' in res_json else -1,
-        res_json['percentCompleteForNextLevel'] if 'percentCompleteForNextLevel' in res_json else 0,
-        res_json['profileIconId'] if 'profileIconId' in res_json else -1,
+        json_['summonerLevel'] if 'summonerLevel' in json_ else -1,
+        json_['percentCompleteForNextLevel'] if 'percentCompleteForNextLevel' in json_ else 0,
+        json_['profileIconId'] if 'profileIconId' in json_ else -1,
     )
 
 
@@ -58,13 +58,13 @@ async def get_blue_essence(connection: LeagueConnection):
     return res_json['ip']
 
 
-async def init_tutorial(connection: LeagueConnection):
+async def init_tutorial(logger: Logger, connection: LeagueConnection):
     ''' Initializes tutorial '''
-    logging.info("Initiating tutorial")
+    logger.log("Initiating tutorial...")
     connection.patch('/lol-npe-tutorial-path/v1/tutorials/init')
 
 
-async def get_tutorial_status(connection: LeagueConnection):
+async def get_tutorial_status(logger: Logger, connection: LeagueConnection):
     ''' Parses the tutorial status '''
     for _ in range(20):
         future = connection.async_get('/lol-npe-tutorial-path/v1/tutorials')
@@ -73,7 +73,7 @@ async def get_tutorial_status(connection: LeagueConnection):
         res_json = res.json()
         if res_json == []:
             print('tutorial retrieve failed')
-            await init_tutorial(connection)
+            await init_tutorial(logger, connection)
             await asyncio.sleep(1)
             continue
         return res_json[0]["status"], res_json[1]["status"], res_json[2]["status"]
@@ -101,16 +101,17 @@ async def get_champions(connection: LeagueConnection):
     return owned, owned_names, available_names
 
 
-def set_summoner_name(connection, name):
+def set_summoner_name(logger: Logger, connection, name):
     ''' Sets the summoner name if available '''
     for _ in range(10):
-        res = connection.get('/lol-summoner/v1/check-name-availability-new-summoners/{}'.format(name))
+        res = connection.get(
+            '/lol-summoner/v1/check-name-availability-new-summoners/{}'.format(name))
         if res.json():
             data = {
                 'name': name,
             }
 
-            logging.info('Setting summoner name')
+            logger.log('Setting summoner name')
             connection.post('/lol-summoner/v1/summoners', json=data)
             connection.post('/lol-login/v1/new-player-flow-completed')
             return

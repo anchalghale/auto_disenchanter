@@ -5,6 +5,7 @@ import threading
 import tkinter as tk
 import types
 import urllib3
+import subprocess
 
 from file import export_csv, import_csv
 from file.pickle import save_state, load_state, create_directories
@@ -42,8 +43,9 @@ OPTIONS = [
 class Application(Gui):
     ''' Main gui class '''
 
-    def __init__(self, master):
-        Gui.__init__(self, master, 'Auto Disenchanter')
+    def __init__(self, root):
+        version = subprocess.check_output('git rev-list --count HEAD').decode('utf-8')
+        Gui.__init__(self, root, f'Auto Disenchanter v{version}')
 
         self.settings = get_settings()
         self.logger = Logger(self.builder, self.settings.log_time_format)
@@ -52,7 +54,7 @@ class Application(Gui):
         self.incidents = Incidents(self.logger, self.settings)
         self.incidents.start_thread()
 
-        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         state = load_state()
         if state is not None and 'options' in state:
             self.logger.init_checkboxes(state['options'])
@@ -70,7 +72,7 @@ class Application(Gui):
             'options': self.get_options(),
             'accounts': self.accounts,
         })
-        self.master.destroy()
+        self.root.destroy()
 
     def get_options(self):
         ''' Returns a list of options and it's state '''

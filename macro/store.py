@@ -1,6 +1,8 @@
 ''' Macro module for store related macros '''
 from client.store import catalog
 
+from gui.logger import Logger
+
 
 def buy(connection, item_id, val):
     ''' Buys a specific item from the store '''
@@ -27,7 +29,7 @@ def buy(connection, item_id, val):
     return res_json["errorDetails"].popitem()[0] if 'errorDetails' in res_json else 'error'
 
 
-def buy_champ_by_be(logger, connection, blue_essence):
+def buy_champ_by_be(logger: Logger, connection, blue_essence):
     ''' Buys all the champions of specific blue essence value '''
     logger.log(f"Getting champions at costs {blue_essence} BE")
     res_json = catalog(connection, "CHAMPION")
