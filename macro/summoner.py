@@ -14,8 +14,8 @@ async def check_username_macro(logger, connection, username):
     logger.log('Getting username...')
     for _ in range(20):
         username_client = await get_username(connection)
-        while username_client is None or username_client == '':
-            asyncio.sleep(1)
+        if username_client is None or username_client == '':
+            await asyncio.sleep(1)
             continue
 
         if username.lower() != username_client.lower():
