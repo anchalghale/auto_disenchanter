@@ -23,7 +23,7 @@ class Gui:
     ''' Main gui class '''
 
     def __init__(self, master, title):
-        # LogWriter(self)
+        LogWriter(self)
         import pygubu       # pylint:disable=import-outside-toplevel
 
         self.master = master
