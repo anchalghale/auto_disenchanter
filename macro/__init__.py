@@ -16,7 +16,7 @@ from process import is_running
 from utils import naturaldelta
 
 from league_process import kill_league_client, kill_riot_client
-from client.exceptions import AccountChangeNeededException, LogoutNeededException, NoSessionException
+from client.exceptions import AccountChangeNeededException, LogoutNeededException, NoSessionException, LootRetrieveException
 from client.summoner import change_icon
 from client.loot import open_champion_capsules, redeem, redeem_free, disenchant
 from client.chest import forge_keys_and_open_generic_chests, forge_worlds_token
@@ -81,13 +81,16 @@ class Macro:
         while True:
             try:
                 start_time = time.time()
-                get_riot_connection_macro(self.logger, self.riot_connection, self.settings)
+                get_riot_connection_macro(
+                    self.logger, self.riot_connection, self.settings)
                 login_macro(self.logger, self.riot_connection, account)
-                get_league_connection_macro(self.logger, self.league_connection, self.settings)
+                get_league_connection_macro(
+                    self.logger, self.league_connection, self.settings)
                 await check_session_macro(self.logger, self.league_connection, account)
                 await check_username_macro(self.logger, self.league_connection, account.username)
                 total_time = time.time() - start_time
-                self.logger.log('Total time taken to login: {}'.format(naturaldelta(total_time)))
+                self.logger.log('Total time taken to login: {}'.format(
+                    naturaldelta(total_time)))
                 self.logger.write_line('console', '-'*75)
 
                 output = await self.handle_disenchant_tasks(options)
@@ -96,7 +99,7 @@ class Macro:
                 kill_league_client(self.settings)
                 kill_riot_client(self.settings)
                 return output
-            except (AccountChangeNeededException, LogoutNeededException):
+            except (AccountChangeNeededException, LootRetrieveException, LogoutNeededException):
                 self.logger.log('Logging out')
                 kill_league_client(self.settings)
                 kill_riot_client(self.settings)
@@ -105,7 +108,8 @@ class Macro:
                 self.logger.log('League client connection failed')
                 kill_league_client(self.settings)
             except NoSessionException:
-                self.logger.log('No session was found. Restarting the client...')
+                self.logger.log(
+                    'No session was found. Restarting the client...')
                 kill_league_client(self.settings)
             except RiotConnectionException:
                 self.logger.log('Riot client connection failed')
