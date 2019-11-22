@@ -16,7 +16,7 @@ def get_settings():
         'riot_client_config': '~/AppData/Local/Riot Games/Riot Client/Config',
         'game_process': 'League of Legends.exe',
         'bug_splat_process': 'BsSndRpt.exe',
-        'connection_retry_count': 5,
+        'connection_retry_count': 180,
         'heartbeat_send_interval': 20,
         'champions': [51, 22, 15, 17, 18, 21],
         'buy_list': [22, 15, 17, 18],
