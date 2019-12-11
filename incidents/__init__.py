@@ -11,20 +11,23 @@ GAME_ERROR_TITLES = [
     'Error',
     'Network Warning',
     'System Error',
-    'Error de conexión'
-    'Bağlantı Hatası',
     'Failed to Connect',
+    'Bağlantı Hatası',
+    'Error de conexión',
+    'Aviso de red',
 ]
 
 
 LEAGUE_CLIENT_ERROR_TITLES = [
     'Error',
     'LeagueClient.exe - Entry Point Not Found',
+    'Data is corrupt.',
 ]
 
 CSRSS_ERROR_TITILES = [
     'LeagueClient.exe - Application Error',
     'League of Legends.exe - Application Error',
+    'RiotClientServices.exe - Application Error',
 ]
 
 
@@ -76,7 +79,11 @@ class Incidents:
                     self.increment_count()
                     close_window(title)
             if is_running(self.settings.bug_splat_process):
-                self.logger.log(f'BugSplat found, killing {self.settings.bug_splat_process}')
+                self.logger.log(f'BugSplat found, killing {self.settings.bug_splat_process}...')
                 self.increment_count()
                 kill_process(self.settings.bug_splat_process)
+            if is_running('Werfault.exe'):
+                self.logger.log(f'Werfault.exe found, killing Werfault.exe...')
+                self.increment_count()
+                kill_process('Werfault.exe')
             time.sleep(5)

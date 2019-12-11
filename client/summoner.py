@@ -60,19 +60,33 @@ async def get_blue_essence(connection: LeagueConnection):
 
 async def init_tutorial(logger: Logger, connection: LeagueConnection):
     ''' Initializes tutorial '''
-    logger.log("Initiating tutorial...")
-    connection.patch('/lol-npe-tutorial-path/v1/tutorials/init')
+    logger.log('Initiating tutorial...')
+    future1 = connection.async_patch('/lol-npe-tutorial-path/v1/tutorials/init')
+    future2 = connection.async_post('/telemetry/v1/events/new_player_experience',
+                                    json={"eventName": "show_screen",
+                                          "plugin": "rcp-fe-lol-new-player-experience",
+                                          "screenName": "npe_tutorial_modules"})
+    future3 = connection.async_put('/lol-npe-tutorial-path/v1/settings',
+                                   json={"hasSeenTutorialPath": True,
+                                         "hasSkippedTutorialPath": False,
+                                         "shouldSeeNewPlayerExperience": False})
+    future1.result()
+    future2.result()
+    future3.result()
 
 
-async def get_tutorial_status(logger: Logger, connection: LeagueConnection):
+async def get_tutorial_status(logger: Logger, connection: LeagueConnection, gathering_data_limit):
     ''' Parses the tutorial status '''
-    for _ in range(20):
+    start_time = time.time()
+    while True:
+        if time.time() - start_time >= gathering_data_limit:
+            return ('UNLOCKED', 'LOCKED', 'LOCKED')
+        await init_tutorial(logger, connection)
         future = connection.async_get('/lol-npe-tutorial-path/v1/tutorials')
         await asyncio.sleep(0)
         res = future.result()
         res_json = res.json()
         if res_json == []:
-            await init_tutorial(logger, connection)
             await asyncio.sleep(1)
             continue
         return res_json[0]["status"], res_json[1]["status"], res_json[2]["status"]

@@ -39,3 +39,15 @@ class LootRetrieveException(Exception):
 
 class BuggedLobbyException(Exception):
     ''' Raised when the lobby is bugged '''
+
+
+class FwotdDataParseException(Exception):
+    ''' Raised when fwotd data can't be parsed properly '''
+
+
+class PatchingRequiredException(Exception):
+    ''' Raised when patching is required '''
+
+    def __init__(self, patcher_state):
+        Exception.__init__(self)
+        self.patcher_state = patcher_state

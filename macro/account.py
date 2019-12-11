@@ -11,7 +11,7 @@ def login_macro(logger, connection, account):
     ''' Logs in to the client '''
     checkpoint_time = time.time()
     logger.log('Logging in...')
-    login(connection, account.username, account.password,
+    login(logger, connection, account.username, account.password,
           account.region, account.locale)
     logger.log('Logged in, took {}'.format(
         naturaldelta(time.time() - checkpoint_time)))

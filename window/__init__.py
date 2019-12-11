@@ -23,14 +23,17 @@ def get_windows():
     @WNDENUMPROC
     def enum_proc_cb(hwnd, l_param):
         ''' Callback for enum windows '''
-        if USER32.IsWindowVisible(hwnd):
-            pid = wintypes.DWORD()
-            _ = USER32.GetWindowThreadProcessId(
-                hwnd, ctypes.byref(pid))
-            length = USER32.GetWindowTextLengthW(hwnd) + 1
-            title = ctypes.create_unicode_buffer(length)
-            USER32.GetWindowTextW(hwnd, title, length)
-            result.append(WindowInfo(pid.value, title.value))
+        try:
+            if USER32.IsWindowVisible(hwnd):
+                pid = wintypes.DWORD()
+                _ = USER32.GetWindowThreadProcessId(
+                    hwnd, ctypes.byref(pid))
+                length = USER32.GetWindowTextLengthW(hwnd) + 1
+                title = ctypes.create_unicode_buffer(length)
+                USER32.GetWindowTextW(hwnd, title, length)
+                result.append(WindowInfo(pid.value, title.value))
+        except ctypes.ArgumentError:
+            pass
         return True
     USER32.EnumWindows(enum_proc_cb, 0)
     return sorted(result)

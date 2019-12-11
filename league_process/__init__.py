@@ -30,6 +30,8 @@ def open_league_client(settings):
 def kill_league_client(settings):
     ''' Kills the league client '''
     kill_process(settings.league_client_process)
+    kill_process(settings.league_client_ux_process)
+    kill_process(settings.league_client_ux_render_process)
 
 
 def kill_riot_client(settings):

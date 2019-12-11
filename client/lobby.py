@@ -14,7 +14,10 @@ def get_queue_id(connection: LeagueConnection):
 def create_lobby(connection: LeagueConnection, queue_id):
     ''' Creates a lobby with the queue id given '''
     data = {"queueId": queue_id}
-    res = connection.post("/lol-lobby/v2/lobby", json=data)
+    if queue_id in [2000, 2010, 2020]:
+        connection.post('/lol-lobby/v2/matchmaking/quick-search', json=data)
+        return None
+    res = connection.post('/lol-lobby/v2/lobby', json=data)
     res = res.json()
     if 'errorCode' in res:
         return res['message']

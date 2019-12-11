@@ -38,7 +38,11 @@ class RiotConnection(Connection):
 
     def get_connection_ft(self, settings):
         ''' Parses connection url and port from lockfile fault tolerant version '''
-        for _ in range(settings.connection_retry_count):
+        start_time = time.time()
+        while True:
+            time_elapsed = time.time() - start_time
+            if time_elapsed > settings.connection_retry_limit:
+                raise RiotConnectionException
             try:
                 open_riot_client(settings)
                 self.get_connection(settings)

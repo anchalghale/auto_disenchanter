@@ -1,42 +1,60 @@
 ''' Module for missions related tasks '''
+import time
 import asyncio
 
 from connection.league import LeagueConnection
+from client.exceptions import LogoutNeededException, FwotdDataParseException
 
 from constants import NPE_REWARDS
 
 
-async def get_missions(connection: LeagueConnection):
+async def get_missions(connection: LeagueConnection, gathering_data_limit, get_fwotd=False):
     ''' Parses the missions data '''
-    future = connection.async_get('/lol-missions/v1/missions')
-    await asyncio.sleep(0)
-    res = future.result()
-    res_json = res.json()
-    if res_json == []:
-        return {}
-    rewards_data = []
-    for reward in NPE_REWARDS:
-        rewards_data.append(
-            next(filter(lambda x, r=reward: x['internalName'] == r, res_json), None))
-    try:
-        rewards_data.append(sorted(filter(
-            lambda x: x['internalName'] == 'fwotd_mission', res_json
-        ), key=lambda x: x['lastUpdatedTimestamp'], reverse=True)[0])
-    except IndexError:
-        pass
-    try:
-        rewards_data.append(sorted(filter(
-            lambda x: x['internalName'] == 'prestige_02_v3', res_json
-        ), key=lambda x: x['lastUpdatedTimestamp'])[0])
-    except IndexError:
-        pass
+    start_time = time.time()
+    fwotd_failure = 0
+    while True:
+        if fwotd_failure >= 5:
+            raise LogoutNeededException
+        if time.time() - start_time >= gathering_data_limit:
+            return {}
+        future = connection.async_get('/lol-missions/v1/missions')
+        await asyncio.sleep(0)
+        res = future.result()
+        res_json = res.json()
+        if res_json == []:
+            await asyncio.sleep(5)
+            continue
+        rewards_data = []
+        for reward in NPE_REWARDS:
+            rewards_data.append(
+                next(filter(lambda x, r=reward: x['internalName'] == r, res_json), None))
+        try:
+            if get_fwotd:
+                fwotd = sorted(filter(
+                    lambda x: x['internalName'] == 'fwotd_mission', res_json
+                ), key=lambda x: x['lastUpdatedTimestamp'], reverse=True)[0]
+                if fwotd['status'] == 'COMPLETED':
+                    if fwotd['completedDate'] in [0, -1]:
+                        raise FwotdDataParseException
+                rewards_data.append(fwotd)
+        except (IndexError, KeyError, FwotdDataParseException):
+            fwotd_failure += 1
+            await asyncio.sleep(5)
+            continue
+        try:
+            rewards_data.append(sorted(filter(
+                lambda x: x['internalName'] == 'prestige_02_v3', res_json
+            ), key=lambda x: x['lastUpdatedTimestamp'])[0])
+        except IndexError:
+            await asyncio.sleep(5)
+            continue
 
-    rewards = {}
-    for reward_data in rewards_data:
-        rewards[reward_data['internalName']] = {
-            'internalName': reward_data['internalName'],
-            'id': reward_data['id'],
-            'status': reward_data['status'],
-            'completed_date': reward_data['completedDate']
-        }
-    return rewards
+        rewards = {}
+        for reward_data in rewards_data:
+            rewards[reward_data['internalName']] = {
+                'internalName': reward_data['internalName'],
+                'id': reward_data['id'],
+                'status': reward_data['status'],
+                'completed_date': reward_data['completedDate']
+            }
+        return rewards

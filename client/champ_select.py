@@ -19,7 +19,7 @@ def get_champion_select_data(connection: LeagueConnection):
 
 
 def get_pickable_champs(connection: LeagueConnection):
-    ''' Fetches pickable champions '''
+    ''' Fetches pickable champions, probably depricaed in patch 9.24 '''
     res = connection.get('/lol-champ-select/v1/pickable-champions')
     res_json = res.json()
     return res_json['championIds']

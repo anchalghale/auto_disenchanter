@@ -1,7 +1,6 @@
 ''' Moudule for league client communication '''
 import os
 import time
-import logging
 import json
 
 import lcu_connector_python as lcu
@@ -21,7 +20,10 @@ class LeagueConnection(Connection):
 
     def get_connection(self, settings):
         ''' Parses connection url and port from lockfile '''
-        connection = lcu.connect(os.path.expanduser(settings.league_client_path))
+        try:
+            connection = lcu.connect(os.path.expanduser(settings.league_client_path))
+        except IndexError:
+            raise LeagueConnectionException
         if connection == 'Ensure the client is running and that you supplied the correct path':
             raise LeagueConnectionException
         self.kwargs = {
@@ -32,19 +34,21 @@ class LeagueConnection(Connection):
         self.url = 'https://' + connection['url']
         try:
             res = self.get('/lol-service-status/v1/lcu-status')
-            if res.json()['status'] != 'online':
-                logging.info('LCU is not online')
+            if res.status_code != 200:
                 raise LeagueConnectionException
         except (requests.RequestException, KeyError, json.decoder.JSONDecodeError):
             raise LeagueConnectionException
 
     def get_connection_ft(self, settings):
         ''' Parses connection url and port from lockfile fault tolerant version '''
-        for _ in range(settings.connection_retry_count):
+        start_time = time.time()
+        while True:
+            time_elapsed = time.time() - start_time
+            if time_elapsed > settings.connection_retry_limit:
+                raise LeagueConnectionException
             try:
                 open_league_client(settings)
                 self.get_connection(settings)
                 return
             except (LeagueConnectionException, OSError):
                 time.sleep(1)
-        raise LeagueConnectionException

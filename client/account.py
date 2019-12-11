@@ -1,13 +1,13 @@
 ''' Module for account related macros '''
+import time
 import asyncio
-
 
 from connection.league import LeagueConnection
 
 from .exceptions import (AccountBannedException,
                          AuthenticationFailureException,
                          ConsentRequiredException, RateLimitedException,
-                         NoSessionException)
+                         NoSessionException, LogoutNeededException)
 
 
 def check_riot_session(connection):
@@ -62,9 +62,19 @@ async def get_username(connection: LeagueConnection):
     return res_json['username']
 
 
-def login(connection, username, password, region, locale):
+def login(logger, connection, *args, time_limit=180):
     ''' Logs in to the client '''
+    username, password, region, locale = args
+    start_time = time.time()
     while True:
+        if time.time() - start_time >= time_limit:
+            raise LogoutNeededException
+        res = connection.get('/rnet-lifecycle/v1/product-context-phase')
+        phase = res.json()
+        if phase not in ['WaitingForAuthentication', 'WaitingForEula', 'Done']:
+            logger.log(f'Riot client phase: {phase}.')
+            time.sleep(2)
+            continue
         state = check_riot_session(connection)
         if state == 'success':
             return

@@ -14,9 +14,10 @@ from macro import Macro
 from updater import update
 from incidents import Incidents
 from client.exceptions import AuthenticationFailureException, ConsentRequiredException
-from settings_local import get_settings
+from settings import get_settings
 from gui import Gui
 from gui.logger import Logger
+from region import REGION, LOCALE
 
 logging.getLogger().setLevel(logging.INFO)
 urllib3.disable_warnings()
@@ -48,12 +49,16 @@ class Application(Gui):
         version = subprocess.check_output('git rev-list --count HEAD').decode('utf-8')
         Gui.__init__(self, root, f'Auto Disenchanter v{version}')
 
-        self.settings = get_settings()
-        self.logger = Logger(self.builder, self.settings.log_time_format)
+        self.logger = Logger(self.builder, '%H:%M:%S')
+        self.settings = get_settings(self.logger, debug=True)
+        self.logger.log_format = self.settings.log_time_format
         self.macro = Macro(self.logger, self.settings)
 
         self.incidents = Incidents(self.logger, self.settings)
         self.incidents.start_thread()
+
+        root.resizable(False, False)
+        root.wm_attributes("-topmost", 1)
 
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         state = load_state()
@@ -123,7 +128,7 @@ class Application(Gui):
                 try:
                     account_ = types.SimpleNamespace(
                         username=account[0], password=account[1],
-                        region=self.settings.region, locale=self.settings.locale)
+                        region=REGION, locale=LOCALE)
                     response = await self.macro.do_macro(options, account_)
                     self.logger.set_cell('accounts', idx, 3, response['blue_essence'])
                     self.accounts[idx].append(response['blue_essence'])
