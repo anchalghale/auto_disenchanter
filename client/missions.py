@@ -11,12 +11,9 @@ from constants import NPE_REWARDS
 async def get_missions(connection: LeagueConnection, gathering_data_limit, get_fwotd=False):
     ''' Parses the missions data '''
     start_time = time.time()
-    fwotd_failure = 0
     while True:
-        if fwotd_failure >= 5:
-            raise LogoutNeededException
         if time.time() - start_time >= gathering_data_limit:
-            return {}
+            raise LogoutNeededException
         future = connection.async_get('/lol-missions/v1/missions')
         await asyncio.sleep(0)
         res = future.result()
@@ -38,7 +35,6 @@ async def get_missions(connection: LeagueConnection, gathering_data_limit, get_f
                         raise FwotdDataParseException
                 rewards_data.append(fwotd)
         except (IndexError, KeyError, FwotdDataParseException):
-            fwotd_failure += 1
             await asyncio.sleep(5)
             continue
         try:

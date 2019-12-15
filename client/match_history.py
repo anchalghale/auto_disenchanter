@@ -1,12 +1,5 @@
 ''' Module for gameflow related tasks '''
-import datetime
-
 import requests
-
-try:
-    import humps
-except ImportError as exp:
-    print(str(exp))
 
 from connection.league import LeagueConnection
 
@@ -31,40 +24,22 @@ async def get_game_data(connection: LeagueConnection):
         match_list = match_list.json()
         deltas = deltas.json()['deltas']
         account_id = match_list['accountId']
-        games_count = match_list['games']['gameCount']
-        games = match_list['games']['games']
-        games = list(filter(lambda g: datetime.date.fromtimestamp(
-            g['gameCreation'] // 1000) == datetime.date.today(), games))
-        ids = [g['gameId'] for g in games]
-        deltas = list(filter(lambda d: d['gameId'] in ids, deltas))
-        games_output = []
-        for game in games:
-            participant = next((p for p in game['participantIdentities']
-                                if p['player']['accountId'] == account_id), None)
-            if participant is None:
-                continue
-            details = next((p for p in game['participants']
-                            if p['participantId'] == participant['participantId']), None)
-            if details is None:
-                continue
-            games_output.append({
-                'id': game['gameId'],
-                'game_delta': game['gameId'],
-                'datetime': game['gameCreationDate'],
-                'duration': game['gameDuration'],
-                'version': game['gameVersion'],
-                'map': game['mapId'],
-                'queue_id': game['queueId'],
-                'details': details
-            })
-        deltas_output = []
-        for delta in deltas:
-            delta['id'] = delta['gameId']
-            deltas_output.append(delta)
+        game = match_list['games']['games'][-1]
+        participant = next((p for p in game['participantIdentities']
+                            if p['player']['accountId'] == account_id), None)
+        stats = next((p for p in game['participants']
+                      if p['participantId'] == participant['participantId']), None)['stats']
+        deltas = next(filter(lambda d: d['gameId'] == game['gameId'], deltas), None)
         return {
-            'games': humps.decamelize(games_output),
-            'games_count': games_count,
-            'game_deltas': humps.decamelize(deltas_output),
+            'id': game['gameId'],
+            'datetime': game['gameCreationDate'],
+            'duration': game['gameDuration'],
+            'queue_id': game['queueId'],
+            'kills': stats['kills'],
+            'deaths': stats['deaths'],
+            'assists': stats['assists'],
+            'wards_killed': stats['wardsKilled'],
+            'exp': deltas['platformDelta']['xpDelta'],
         }
-    except (KeyError, requests.exceptions.RequestException):
+    except (KeyError, TypeError, requests.exceptions.RequestException):
         return None
