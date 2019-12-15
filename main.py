@@ -25,6 +25,7 @@ urllib3.disable_warnings()
 OPTIONS = [
     'open_generic_chests',
     'forge_worlds_token',
+    'forge_night_and_dawn_tokens',
     'open_champion_capsules',
     'redeem_free',
     'redeem_450',
