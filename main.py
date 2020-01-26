@@ -7,6 +7,7 @@ import types
 import subprocess
 
 import urllib3
+import pygubu
 
 from file import export_csv, import_csv
 from file.pickle import save_state, load_state, create_directories
@@ -15,8 +16,8 @@ from updater import update
 from incidents import Incidents
 from client.exceptions import AuthenticationFailureException, ConsentRequiredException
 from settings import get_settings
-from gui import Gui
-from gui.logger import Logger
+from builder import Builder
+from logger import TkinterLogger
 from region import REGION, LOCALE
 
 logging.getLogger().setLevel(logging.INFO)
@@ -24,8 +25,7 @@ urllib3.disable_warnings()
 
 OPTIONS = [
     'open_generic_chests',
-    'forge_worlds_token',
-    'forge_night_and_dawn_tokens',
+    'forge_tokens',
     'open_champion_capsules',
     'redeem_free',
     'redeem_450',
@@ -43,14 +43,22 @@ OPTIONS = [
 ]
 
 
-class Application(Gui):
+class Application:
     ''' Main gui class '''
 
     def __init__(self, root):
         version = subprocess.check_output('git rev-list --count HEAD').decode('utf-8')
-        Gui.__init__(self, root, f'Auto Disenchanter v{version}')
+        root.title(f'Auto Disenchanter v{version}')
+        root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.builder = builder = pygubu.Builder()
+        builder.add_from_file('main_frame.ui')
+        builder.get_object('main_frame', root)
+        builder.connect_callbacks(self)
 
-        self.logger = Logger(self.builder, '%H:%M:%S')
+        self.builder_wrapper = Builder(builder)
+        self.root = root
+
+        self.logger = TkinterLogger(self.builder, '%H:%M:%S')
         self.settings = get_settings(self.logger, debug=True)
         self.logger.log_format = self.settings.log_time_format
         self.macro = Macro(self.logger, self.settings)
@@ -61,15 +69,14 @@ class Application(Gui):
         root.resizable(False, False)
         root.wm_attributes("-topmost", 1)
 
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         state = load_state()
         if state is not None and 'options' in state:
-            self.logger.init_checkboxes(state['options'])
+            self.builder_wrapper.init_checkboxes(state['options'])
         else:
-            self.logger.init_checkboxes(dict.fromkeys(OPTIONS, False))
+            self.builder_wrapper.init_checkboxes(dict.fromkeys(OPTIONS, False))
         if state is not None and 'accounts' in state:
             self.accounts = state['accounts']
-            self.logger.set_treeview('accounts', self.accounts)
+            self.builder_wrapper.set_treeview('accounts', self.accounts)
         else:
             self.accounts = []
 
@@ -131,7 +138,7 @@ class Application(Gui):
                         username=account[0], password=account[1],
                         region=REGION, locale=LOCALE)
                     response = await self.macro.do_macro(options, account_)
-                    self.logger.set_cell('accounts', idx, 3, response['blue_essence'])
+                    self.builder_wrapper.set_cell('accounts', idx, 3, response['blue_essence'])
                     self.accounts[idx].append(response['blue_essence'])
                 except AuthenticationFailureException:
                     logging.info('Account %s has invalid credentials', account[0])
@@ -146,7 +153,7 @@ class Application(Gui):
         accounts = import_csv()
         if accounts is not None:
             self.accounts = accounts
-            self.logger.set_treeview('accounts', self.accounts)
+            self.builder_wrapper.set_treeview('accounts', self.accounts)
 
     def export_csv(self):
         ''' Called when export button is pressed '''

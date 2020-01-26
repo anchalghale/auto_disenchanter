@@ -1,7 +1,7 @@
 ''' Macro module for store related macros '''
 from client.store import catalog
 
-from gui.logger import Logger
+from logger import Logger
 
 
 def buy(connection, item_id, val):

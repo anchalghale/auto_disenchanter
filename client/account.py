@@ -2,6 +2,8 @@
 import time
 import asyncio
 
+import requests
+
 from connection.league import LeagueConnection
 
 from .exceptions import (AccountBannedException,
@@ -62,6 +64,24 @@ async def get_username(connection: LeagueConnection):
     return res_json['username']
 
 
+def wait_until_patched(logger, connection, time_limit=7200):
+    ''' Waits for patching to be complete '''
+    start_time = time.time()
+    while True:
+        try:
+            time.sleep(10)
+            time_elapsed = time.time() - start_time
+            logger.log(f'Patching riot client. Time elapsed: {int(time_elapsed)}s.')
+            if time_elapsed > time_limit:
+                raise LogoutNeededException
+            res = connection.get('/rnet-lifecycle/v1/product-context-phase')
+            phase = res.json()
+            if phase != 'WaitingForPatchStatus':
+                break
+        except requests.exceptions.RequestException:
+            pass
+
+
 def login(logger, connection, *args, time_limit=180):
     ''' Logs in to the client '''
     username, password, region, locale = args
@@ -71,6 +91,9 @@ def login(logger, connection, *args, time_limit=180):
             raise LogoutNeededException
         res = connection.get('/rnet-lifecycle/v1/product-context-phase')
         phase = res.json()
+        if phase == 'WaitingForPatchStatus':
+            wait_until_patched(logger, connection)
+            continue
         if phase not in ['WaitingForAuthentication', 'WaitingForEula', 'Done']:
             logger.log(f'Riot client phase: {phase}.')
             time.sleep(2)

@@ -34,3 +34,14 @@ def start_matchmaking(connection: LeagueConnection):
 def accept_queue(connection: LeagueConnection):
     ''' Accepts the ready check '''
     connection.post("/lol-matchmaking/v1/ready-check/accept")
+
+
+def accept_invitation(connection: LeagueConnection, invitation_id):
+    '''Accepts the incoming invitation'''
+    connection.post(
+        f'/lol-lobby/v2/received-invitations/{invitation_id}/accept')
+
+
+def send_invitations(connection: LeagueConnection, data):
+    '''Send an game invite to given id'''
+    connection.post('/lol-lobby/v2/lobby/invitations', json=data)

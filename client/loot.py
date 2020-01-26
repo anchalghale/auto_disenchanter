@@ -2,7 +2,7 @@
 import re
 import time
 
-from gui.logger import Logger
+from logger import Logger
 
 from .exceptions import LootRetrieveException
 
@@ -68,10 +68,10 @@ def redeem(logger, connection, value):
     raise LootRetrieveException
 
 
-def open_champion_capsules(logger: Logger, connection):
+def open_champion_capsules(logger: Logger, connection, retry_limit=1):
     ''' Opens  all champion capsules '''
     logger.log("Opening all champion capsules")
-    for _ in range(10):
+    for _ in range(retry_limit):
         try:
             res_json = get_loot(logger, connection)
         except LootRetrieveException:
@@ -91,10 +91,10 @@ def open_champion_capsules(logger: Logger, connection):
     raise LootRetrieveException
 
 
-def disenchant(logger: Logger, connection):
+def disenchant(logger: Logger, connection, retry_limit=10):
     ''' Disenchants the champion shards '''
     logger.log("Disenchanting all champion shards")
-    for _ in range(10):
+    for _ in range(retry_limit):
         try:
             res_json = get_loot(logger, connection)
         except LootRetrieveException:

@@ -5,7 +5,7 @@ import asyncio
 import requests
 
 from connection.league import LeagueConnection
-from gui.logger import Logger
+from logger import Logger
 
 from .exceptions import BadUsernameException
 
@@ -44,6 +44,7 @@ async def get_summoner_data(connection: LeagueConnection):
         json_['summonerLevel'] if 'summonerLevel' in json_ else -1,
         json_['percentCompleteForNextLevel'] if 'percentCompleteForNextLevel' in json_ else 0,
         json_['profileIconId'] if 'profileIconId' in json_ else -1,
+        json_['summonerId'] if 'summonerId' in json_ else -1
     )
 
 

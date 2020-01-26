@@ -2,10 +2,10 @@
 import time
 import threading
 
-from window import get_windows, close_window
+from window import get_windows, close_window_by_title
 from league_process import kill_game, kill_league_client
 from process import is_running, kill_process
-from gui.logger import Logger
+from logger import Logger
 
 GAME_ERROR_TITLES = [
     'Error',
@@ -25,6 +25,9 @@ LEAGUE_CLIENT_ERROR_TITLES = [
 ]
 
 CSRSS_ERROR_TITILES = [
+    'LeagueClient.exe - System Error',
+    'League of Legends.exe - System Error',
+    'RiotClientServices.exe - System Error',
     'LeagueClient.exe - Application Error',
     'League of Legends.exe - Application Error',
     'RiotClientServices.exe - Application Error',
@@ -77,7 +80,7 @@ class Incidents:
                     self.logger.log(
                         f'Bad window title found: {title}. Closing the {title} window...')
                     self.increment_count()
-                    close_window(title)
+                    close_window_by_title(title)
             if is_running(self.settings.bug_splat_process):
                 self.logger.log(f'BugSplat found, killing {self.settings.bug_splat_process}...')
                 self.increment_count()

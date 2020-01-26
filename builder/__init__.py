@@ -1,33 +1,12 @@
-''' Module that contains the the utility functions of gui '''
+''' A wrapper class module the pygubu builder for easy gui building '''
 import tkinter as tk
-from datetime import datetime
 
 
-class CliLogger:
-    ''' A cli logger '''
-
-    def __init__(self, log_format):
-        self.log_format = log_format
-
-    def set_entry(self, name, value):
-        ''' Sets value of entry component '''
-        print(f'{name} -> {value}')
-
-    def write_line(self, name, value):
-        ''' Writes a line to a textbox '''
-        print(f'>> {name} -> {value}')
-
-    def log(self, message):
-        ''' Logs a message to the console including time '''
-        print(f'{datetime.now().strftime(self.log_format)} - {str(message)}')
-
-
-class Logger:
+class Builder:
     ''' A wrapper class around the pygubu builder for easy gui building '''
 
-    def __init__(self, builder, log_format):
+    def __init__(self, builder):
         self.builder = builder
-        self.log_format = log_format
 
     def widget_exists(self, name):
         ''' Checks if a widget exists '''
@@ -43,10 +22,6 @@ class Logger:
         ''' Writes a line to a textbox '''
         self.builder.get_object(name).insert(tk.END, '>> ' + str(value) + '\n')
         self.builder.get_object(name).see('end')
-
-    def log(self, message):
-        ''' Logs a message to the console including time '''
-        self.write_line('console', f'{datetime.now().strftime(self.log_format)} - {str(message)}')
 
     def insert_row(self, name, value):
         ''' Sets value of a single row of treeview component '''

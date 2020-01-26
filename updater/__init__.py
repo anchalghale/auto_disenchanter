@@ -4,7 +4,7 @@ import sys
 import time
 from subprocess import CalledProcessError, TimeoutExpired, check_output, run
 
-from gui.logger import Logger
+from logger import Logger
 
 
 def is_out_of_date(cwd):

@@ -1,8 +1,9 @@
 ''' Module for chest related tasks '''
 import time
 
-from gui.logger import Logger
+from logger import Logger
 
+from .utils import Recipe, RECIPIES
 from .loot import get_loot
 from .exceptions import LootRetrieveException
 
@@ -64,7 +65,7 @@ def forge_champion_from_token(logger: Logger, connection, forge_url, forge_json,
     ''' Forges key fragment to keys '''
     if repeat == 0:
         return
-    logger.log(f'Forging {repeat} champion shards from worlds token')
+    logger.log(f'Forging {repeat} champion shards from tokens')
     connection.post(f'/lol-loot/v1/recipes/{forge_url}/craft?repeat={repeat}', json=forge_json)
 
 
@@ -78,9 +79,9 @@ def open_generic_chests(logger: Logger, connection, repeat=1):
             repeat), json=['CHEST_generic', 'MATERIAL_key'])
 
 
-def forge_keys_and_open_generic_chests(logger: Logger, connection):
+def forge_keys_and_open_generic_chests(logger: Logger, connection, retry_limit=10):
     ''' Forges all key fragments and opens all generic chests '''
-    for _ in range(10):
+    for _ in range(retry_limit):
         try:
             loot_json = get_loot(logger, connection)
         except LootRetrieveException:
@@ -99,37 +100,24 @@ def forge_keys_and_open_generic_chests(logger: Logger, connection):
     raise LootRetrieveException
 
 
-def forge_worlds_token(logger: Logger, connection):
-    ''' Forges all key fragments and opens all generic chests '''
-    for _ in range(10):
+def forge_tokens(logger: Logger, connection, recipe: Recipe, retry_limit=10):
+    ''' Forges all tokens using the given recipe '''
+    for _ in range(retry_limit):
         try:
             loot_json = get_loot(logger, connection)
         except LootRetrieveException:
             time.sleep(1)
             continue
-        worlds_token_count = get_loot_count(loot_json, 'MATERIAL_337')
-        forgable = worlds_token_count//50
+        tokens_count = get_loot_count(loot_json, recipe.material)
+        forgable = tokens_count//recipe.cost
         if forgable == 0:
             return
-        forge_champion_from_token(logger, connection,
-                                  'MATERIAL_337_FORGE_33', ['MATERIAL_337'],
-                                  repeat=forgable)
+        forge_champion_from_token(logger, connection, recipe.recipe,
+                                  [recipe.material], repeat=forgable)
     raise LootRetrieveException
 
 
-def forge_night_and_dawn_tokens(logger: Logger, connection):
-    ''' Forges all key fragments and opens all generic chests '''
-    for _ in range(10):
-        try:
-            loot_json = get_loot(logger, connection)
-        except LootRetrieveException:
-            time.sleep(1)
-            continue
-        tokens_count = get_loot_count(loot_json, 'MATERIAL_347')
-        forgable = tokens_count//50
-        if forgable == 0:
-            return
-        forge_champion_from_token(logger, connection,
-                                  'MATERIAL_347_FORGE_19',
-                                  ['MATERIAL_347'], repeat=forgable,)
-    raise LootRetrieveException
+def forge_all_tokens(logger: Logger, connection, retry_limit=10):
+    ''' Forges all tokens using the given recipe '''
+    for recipe in RECIPIES:
+        forge_tokens(logger, connection, recipe, retry_limit)

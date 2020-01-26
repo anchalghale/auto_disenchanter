@@ -24,6 +24,6 @@ def create_lobby(connection: LeagueConnection, queue_id):
     return None
 
 
-def delete_lobby(connection: LeagueConnection):
+async def delete_lobby(connection: LeagueConnection):
     ''' Deletes the current lobby '''
-    connection.delete("/lol-lobby/v2/lobby")
+    connection.async_delete('/lol-lobby/v2/lobby')

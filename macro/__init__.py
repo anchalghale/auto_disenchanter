@@ -8,7 +8,7 @@ import lcu_connector_python as lcu
 import requests
 import urllib3
 
-from gui.logger import Logger
+from logger import Logger
 
 from connection.league import LeagueConnection, LeagueConnectionException
 from connection.riot import RiotConnection, RiotConnectionException
@@ -19,8 +19,7 @@ from league_process import kill_league_client, kill_riot_client
 from client.summoner import change_icon
 from client.loot import open_champion_capsules, redeem, redeem_free, disenchant
 from client.summoner import get_blue_essence
-from client.chest import (forge_keys_and_open_generic_chests,
-                          forge_worlds_token, forge_night_and_dawn_tokens)
+from client.chest import forge_keys_and_open_generic_chests, forge_all_tokens
 from client.exceptions import (AccountChangeNeededException,
                                LogoutNeededException, NoSessionException,
                                LootRetrieveException)
@@ -53,8 +52,7 @@ class Macro:
         handlers = {
             'open_champion_capsules': (open_champion_capsules, state, {}),
             'open_generic_chests': (forge_keys_and_open_generic_chests, state, {}),
-            'forge_worlds_token': (forge_worlds_token, state, {}),
-            'forge_night_and_dawn_tokens': (forge_night_and_dawn_tokens, state, {}),
+            'forge_tokens': (forge_all_tokens, state, {}),
             'redeem_free': (redeem_free, state, {}),
             'redeem_450': (redeem, [*state, 450], {}),
             'redeem_1350': (redeem, [*state, 1350], {}),

@@ -45,6 +45,10 @@ class FwotdDataParseException(Exception):
     ''' Raised when fwotd data can't be parsed properly '''
 
 
+class BotContinueException(Exception):
+    ''' Raised when bot loop needs to be continued '''
+
+
 class PatchingRequiredException(Exception):
     ''' Raised when patching is required '''
 

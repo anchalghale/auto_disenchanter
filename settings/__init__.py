@@ -11,13 +11,12 @@ from server import SERVER_URL, SERVER_AUTH
 from utils import get_base_dir
 
 
-DEBUG = False
 BASE_DIR = get_base_dir()
 
 
 def get_settings(logger, debug=False):
     ''' Parses the settings locally or from the server according to the debug value '''
-    if DEBUG or debug:
+    if debug:
         with open('settings.json') as file:
             settings_ = json.load(file)
     else:
