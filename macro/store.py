@@ -35,7 +35,13 @@ def buy_champ_by_be(logger: Logger, connection, blue_essence):
     res_json = catalog(connection, "CHAMPION")
     filtered = list(filter(lambda m: m["prices"][0]["cost"] == blue_essence, res_json))
     for champ in filtered:
-        name = champ["localizations"]["en_GB"]["name"]
+        if 'en_GB' in champ["localizations"]:
+            name = champ["localizations"]["en_GB"]["name"]
+        elif 'en_US' in champ["localizations"]:
+            name = champ["localizations"]["en_US"]["name"]
+        else:
+            raise RuntimeError(f'Localizations en_GB or en_US not found. '
+                               f'Current values: {list(champ["localizations"].keys())}')
         logger.log(f'Buying {name}...')
         result = buy(connection, champ["itemId"], champ["prices"][0]["cost"])
         if result == "error":
