@@ -17,7 +17,7 @@ from utils import naturaldelta
 
 from league_process import kill_league_client, kill_riot_client
 from client.summoner import change_icon
-from client.loot import open_champion_capsules, redeem, redeem_free, disenchant
+from client.loot import open_champion_capsules, redeem, redeem_free, disenchant, redeem_waterloo
 from client.summoner import get_blue_essence
 from client.chest import forge_keys_and_open_generic_chests, forge_all_tokens
 from client.exceptions import (AccountChangeNeededException,
@@ -59,6 +59,7 @@ class Macro:
             'redeem_3150': (redeem, [*state, 3150], {}),
             'redeem_4800': (redeem, [*state, 4800], {}),
             'redeem_6300': (redeem, [*state, 6300], {}),
+            'redeem_waterloo': (redeem_waterloo, [*state], {}),
             'disenchant': (disenchant, state, {}),
             'buy_450': (buy_champ_by_be, [*state, 450], {}),
             'buy_1350': (buy_champ_by_be, [*state, 1350], {}),

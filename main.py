@@ -33,6 +33,7 @@ OPTIONS = [
     'redeem_3150',
     'redeem_4800',
     'redeem_6300',
+    'redeem_waterloo',
     'disenchant',
     'buy_450',
     'buy_1350',

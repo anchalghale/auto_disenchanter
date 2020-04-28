@@ -67,6 +67,14 @@ def redeem(logger, connection, value):
         process_redeem(logger, connection, loot_result)
     raise LootRetrieveException
 
+def redeem_waterloo(logger, connection):
+    '''Redeems waterloo'''
+    logger.log("Redeeming Waterloo(Miss Fortune)")
+    for _ in range(3):
+        data = ["CHAMPION_SKIN_RENTAL_21002", "CURRENCY_cosmetic"]
+        res = connection.post('/lol-loot/v1/recipes/SKIN_upgrade/craft?repeat=1', json=data)
+        if res.ok:
+            break
 
 def open_champion_capsules(logger: Logger, connection, retry_limit=1):
     ''' Opens  all champion capsules '''
