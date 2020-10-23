@@ -1,12 +1,12 @@
 ''' Moudule for league client communication '''
+import json
 import os
 import time
-import json
 
 import lcu_connector_python as lcu
 import requests
-
 from league_process import open_league_client
+from paths import LEAGUE_CLIENT_PATH
 
 from . import Connection
 
@@ -21,7 +21,7 @@ class LeagueConnection(Connection):
     def get_connection(self, settings):
         ''' Parses connection url and port from lockfile '''
         try:
-            connection = lcu.connect(os.path.expanduser(settings.league_client_path))
+            connection = lcu.connect(os.path.expanduser(LEAGUE_CLIENT_PATH))
         except IndexError:
             raise LeagueConnectionException
         if connection == 'Ensure the client is running and that you supplied the correct path':
