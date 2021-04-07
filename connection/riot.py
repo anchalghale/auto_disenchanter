@@ -6,9 +6,10 @@ import lcu_connector_python as lcu
 import requests
 
 from league_process import open_riot_client
-from paths import get_riot_client_path
 
 from . import Connection
+
+config = os.path.expanduser('~/AppData/Local/Riot Games/Riot Client/Config')
 
 
 class RiotConnectionException(Exception):
@@ -21,7 +22,7 @@ class RiotConnection(Connection):
     def get_connection(self, settings):
         ''' Parses connection url and port from lockfile '''
         try:
-            connection = lcu.connect(get_riot_client_path())
+            connection = lcu.connect(config)
         except IndexError:
             raise RiotConnectionException
         if connection == 'Ensure the client is running and that you supplied the correct path':

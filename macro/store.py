@@ -1,32 +1,18 @@
 ''' Macro module for store related macros '''
+from base.resources import get_json
 from client.store import catalog
-
 from logger import Logger
 
 
-def buy(connection, item_id, val):
+def buy(connection, item_id, price):
     ''' Buys a specific item from the store '''
-    data = {
-        "items": [
-            {
-                "itemKey": {
-                    "inventoryType": "CHAMPION",
-                    "itemId": item_id
-                },
-                "purchaseCurrencyInfo": {
-                    "currencyType": "IP",
-                    "price": val,
-                    "purchasable": True,
-                },
-                "quantity": 1
-            }
-        ]
-    }
-    res = connection.post('/lol-purchase-widget/v1/purchaseItems', json=data)
-    res_json = res.json()
-    if res.status_code == 200:
-        return "success"
-    return res_json["errorDetails"].popitem()[0] if 'errorDetails' in res_json else 'error'
+    data = get_json('buyData')
+    data['items'][0]['itemKey']['itemId'] = item_id
+    data['items'][0]['purchaseCurrencyInfo']['price'] = price
+    response = connection.post('/lol-purchase-widget/v2/purchaseItems', json=data)
+    if response.ok:
+        return None
+    return response.json()
 
 
 def buy_champ_by_be(logger: Logger, connection, blue_essence):
@@ -43,13 +29,7 @@ def buy_champ_by_be(logger: Logger, connection, blue_essence):
             raise RuntimeError(f'Localizations en_GB or en_US not found. '
                                f'Current values: {list(champ["localizations"].keys())}')
         logger.log(f'Buying {name}...')
-        result = buy(connection, champ["itemId"], champ["prices"][0]["cost"])
-        if result == "error":
-            logger.log("Error buying champion.")
+        error = buy(connection, champ["itemId"], champ["prices"][0]["cost"])
+        if error is not None:
+            logger.log(error)
             continue
-        if result == "validation.item.owned":
-            logger.log("Champion already owned")
-            continue
-        if result == "validation.item.not.enough.currency":
-            logger.log("Not enough BE to buy champion")
-            break
