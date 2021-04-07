@@ -1,4 +1,6 @@
 ''' Macro module for store related macros '''
+import time
+
 from base.resources import get_json
 from client.store import catalog
 from logger import Logger
@@ -18,7 +20,15 @@ def buy(connection, item_id, price):
 def buy_champ_by_be(logger: Logger, connection, blue_essence):
     ''' Buys all the champions of specific blue essence value '''
     logger.log(f"Getting champions at costs {blue_essence} BE")
-    res_json = catalog(connection, "CHAMPION")
+    for _ in range(10):
+        res_json = catalog(connection, "CHAMPION")
+        if res_json is not None:
+            break
+        logger.log('Failed. Retrying...')
+        time.sleep(2)
+    else:
+        logger.log('Retry limit reached. Aborting buying champion...')
+        return
     filtered = list(filter(lambda m: m["prices"][0]["cost"] == blue_essence, res_json))
     for champ in filtered:
         if 'en_GB' in champ["localizations"]:

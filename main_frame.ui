@@ -276,8 +276,8 @@
         </child>
         <child>
           <object class="tk.Label" id="import_note">
-            <property name="text" translatable="yes">Note: The csv only supports
-username:password format.</property>
+            <property name="text" translatable="yes">Note: Accounts csv must be uploaded
+in username:password format.</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>

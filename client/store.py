@@ -6,6 +6,8 @@ def catalog(connection: LeagueConnection, item_type):
     ''' Parses the item catalog for a item type '''
     url = '/lol-store/v1/catalog?inventoryType=["%s"]' % item_type
     res = connection.get(url)
+    if not res.ok:
+        return None
     return res.json()
 
 

@@ -4,20 +4,25 @@ import logging
 import threading
 import tkinter as tk
 import types
-import subprocess
 
-import urllib3
 import pygubu
+import urllib3
+from pygubu.builder import ttkstdwidgets  # for pyinstaller support
 
-from file import export_csv, import_csv
-from file.pickle import save_state, load_state, create_directories
-from macro import Macro
-from incidents import Incidents
-from client.exceptions import AuthenticationFailureException, ConsentRequiredException
-from settings import get_settings
 from builder import Builder
+from client.exceptions import AuthenticationFailureException
+from client.exceptions import ConsentRequiredException
+from file import export_csv
+from file import import_csv
+from file.pickle import create_directories
+from file.pickle import load_state
+from file.pickle import save_state
+from incidents import Incidents
 from logger import TkinterLogger
-from region import REGION, LOCALE
+from macro import Macro
+from region import LOCALE
+from region import REGION
+from settings import get_settings
 
 logging.getLogger().setLevel(logging.INFO)
 urllib3.disable_warnings()
