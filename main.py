@@ -12,7 +12,6 @@ import pygubu
 from file import export_csv, import_csv
 from file.pickle import save_state, load_state, create_directories
 from macro import Macro
-from updater import update
 from incidents import Incidents
 from client.exceptions import AuthenticationFailureException, ConsentRequiredException
 from settings import get_settings
@@ -48,8 +47,7 @@ class Application:
     ''' Main gui class '''
 
     def __init__(self, root):
-        version = subprocess.check_output('git rev-list --count HEAD').decode('utf-8')
-        root.title(f'Auto Disenchanter v{version}')
+        root.title(f'Auto Disenchanter')
         root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.builder = builder = pygubu.Builder()
         builder.add_from_file('main_frame.ui')
@@ -126,7 +124,6 @@ class Application:
             'options': self.get_options(),
             'accounts': self.accounts,
         })
-        update(self.logger)
 
         for idx, account in enumerate(self.accounts):
             if len(account) == 2:

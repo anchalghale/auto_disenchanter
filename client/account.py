@@ -38,7 +38,7 @@ EULA_PHASES = [
 def check_riot_session(connection):
     ''' Checks session of riot client '''
     res = connection.get('/rso-auth/v1/authorization')
-    if res.status_code == 404:
+    if not res.ok:
         return 'no_authorization'
     res = connection.get('/eula/v1/agreement')
     res_json = res.json()
