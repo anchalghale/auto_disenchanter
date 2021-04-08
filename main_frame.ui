@@ -274,6 +274,18 @@
             </layout>
           </object>
         </child>
+        <child>
+          <object class="tk.Label" id="import_note">
+            <property name="text" translatable="yes">Note: The csv only supports
+username:password format.</property>
+            <layout>
+              <property name="column">0</property>
+              <property name="columnspan">3</property>
+              <property name="propagate">True</property>
+              <property name="row">19</property>
+            </layout>
+          </object>
+        </child>
       </object>
     </child>
     <child>

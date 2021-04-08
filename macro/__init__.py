@@ -8,26 +8,35 @@ import lcu_connector_python as lcu
 import requests
 import urllib3
 
+from client.chest import forge_all_tokens
+from client.chest import forge_keys_and_open_generic_chests
+from client.exceptions import AccountChangeNeededException
+from client.exceptions import LogoutNeededException
+from client.exceptions import LootRetrieveException
+from client.exceptions import NoSessionException
+from client.loot import disenchant
+from client.loot import open_champion_capsules
+from client.loot import redeem
+from client.loot import redeem_free
+from client.loot import redeem_waterloo
+from client.summoner import change_icon
+from client.summoner import get_blue_essence
+from connection.league import LeagueConnection
+from connection.league import LeagueConnectionException
+from connection.riot import RiotConnection
+from connection.riot import RiotConnectionException
+from league_process import kill_league_client
+from league_process import kill_riot_client
 from logger import Logger
-
-from connection.league import LeagueConnection, LeagueConnectionException
-from connection.riot import RiotConnection, RiotConnectionException
 from process import is_running
 from utils import naturaldelta
 
-from league_process import kill_league_client, kill_riot_client
-from client.summoner import change_icon
-from client.loot import open_champion_capsules, redeem, redeem_free, disenchant, redeem_waterloo
-from client.summoner import get_blue_essence
-from client.chest import forge_keys_and_open_generic_chests, forge_all_tokens
-from client.exceptions import (AccountChangeNeededException,
-                               LogoutNeededException, NoSessionException,
-                               LootRetrieveException)
-
-from .summoner import check_username_macro
+from .account import check_session_macro
+from .account import get_league_connection_macro
+from .account import get_riot_connection_macro
+from .account import login_macro
 from .store import buy_champ_by_be
-from .account import (login_macro, get_riot_connection_macro, get_league_connection_macro,
-                      check_session_macro)
+from .summoner import check_username_macro
 
 
 def handle_not_implemented():

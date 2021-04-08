@@ -5,8 +5,9 @@ import time
 
 import lcu_connector_python as lcu
 import requests
+
 from league_process import open_league_client
-from paths import LEAGUE_CLIENT_PATH
+from paths import get_league_client_path
 
 from . import Connection
 
@@ -21,7 +22,7 @@ class LeagueConnection(Connection):
     def get_connection(self, settings):
         ''' Parses connection url and port from lockfile '''
         try:
-            connection = lcu.connect(os.path.expanduser(LEAGUE_CLIENT_PATH))
+            connection = lcu.connect(get_league_client_path())
         except IndexError:
             raise LeagueConnectionException
         if connection == 'Ensure the client is running and that you supplied the correct path':

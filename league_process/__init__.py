@@ -2,14 +2,17 @@
 import subprocess
 import time
 
-from process import is_running, kill_process
+from paths import get_league_client_path
+from paths import get_riot_client_path
+from process import is_running
+from process import kill_process
 
 
 def open_riot_client(settings):
     ''' Starts riot client process '''
     while not is_running(settings.riot_client_process):
         subprocess.Popen([
-            settings.riot_client_services_path,
+            get_riot_client_path(),
             # "--headless",
             "--launch-product=league_of_legends",
             "--launch-patchline=live"])
@@ -20,7 +23,7 @@ def open_league_client(settings):
     ''' Starts league client process '''
     while not is_running(settings.league_client_process):
         try:
-            subprocess.Popen([settings.league_client_path, "--headless"])
+            subprocess.Popen([get_league_client_path(), "--headless"])
         except PermissionError:
             pass
         finally:
