@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <interface>
-  <object class="tk.Frame" id="main_frame">
+  <object id="main_frame" class="tk.Frame">
     <property name="height">200</property>
     <property name="width">200</property>
     <layout>
@@ -9,7 +9,7 @@
       <property name="row">0</property>
     </layout>
     <child>
-      <object class="tk.LabelFrame" id="tasks">
+      <object id="tasks" class="tk.LabelFrame">
         <property name="height">200</property>
         <property name="text" translatable="yes">Tasks</property>
         <property name="width">200</property>
@@ -20,7 +20,7 @@
           <property name="sticky">nw</property>
         </layout>
         <child>
-          <object class="ttk.Checkbutton" id="open_generic_chests">
+          <object id="open_generic_chests" class="ttk.Checkbutton">
             <property name="text" translatable="yes">Open Generic Chests</property>
             <layout>
               <property name="column">0</property>
@@ -32,8 +32,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="forge_tokens">
-            <property name="text" translatable="yes">Forge Tokens</property>
+          <object id="open_masterwork_chests" class="ttk.Checkbutton">
+            <property name="text" translatable="yes">Open Masterwork Chests</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -44,8 +44,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="open_champion_capsules">
-            <property name="text" translatable="yes">Open Champion Capsules</property>
+          <object id="forge_tokens" class="ttk.Checkbutton">
+            <property name="text" translatable="yes">Forge Tokens</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -56,8 +56,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="redeem_free">
-            <property name="text" translatable="yes">Redeem Free Shards</property>
+          <object id="open_champion_capsules" class="ttk.Checkbutton">
+            <property name="text" translatable="yes">Open Champion Capsules</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -68,8 +68,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="redeem_450">
-            <property name="text" translatable="yes">Redeem 450BE Shards</property>
+          <object id="redeem_free" class="ttk.Checkbutton">
+            <property name="text" translatable="yes">Redeem Free Shards</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -80,8 +80,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="redeem_1350">
-            <property name="text" translatable="yes">Redeem 1350BE Shards</property>
+          <object id="redeem_450" class="ttk.Checkbutton">
+            <property name="text" translatable="yes">Redeem 450BE Shards</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -92,8 +92,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="redeem_3150">
-            <property name="text" translatable="yes">Redeem 3150BE Shards</property>
+          <object id="redeem_1350" class="ttk.Checkbutton">
+            <property name="text" translatable="yes">Redeem 1350BE Shards</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -104,8 +104,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="redeem_4800">
-            <property name="text" translatable="yes">Redeem 4800BE Shards</property>
+          <object id="redeem_3150" class="ttk.Checkbutton">
+            <property name="text" translatable="yes">Redeem 3150BE Shards</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -116,8 +116,8 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="redeem_6300">
-            <property name="text" translatable="yes">Redeem 6300BE Shards</property>
+          <object id="redeem_4800" class="ttk.Checkbutton">
+            <property name="text" translatable="yes">Redeem 4800BE Shards</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -128,7 +128,19 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="disenchant">
+          <object id="redeem_6300" class="ttk.Checkbutton">
+            <property name="text" translatable="yes">Redeem 6300BE Shards</property>
+            <layout>
+              <property name="column">0</property>
+              <property name="columnspan">3</property>
+              <property name="propagate">True</property>
+              <property name="row">9</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object id="disenchant" class="ttk.Checkbutton">
             <property name="text" translatable="yes">Disenchant Champion Shards</property>
             <layout>
               <property name="column">0</property>
@@ -140,7 +152,7 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="buy_450">
+          <object id="buy_450" class="ttk.Checkbutton">
             <property name="text" translatable="yes">Buy 450BE Champions</property>
             <layout>
               <property name="column">0</property>
@@ -152,7 +164,7 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="buy_1350">
+          <object id="buy_1350" class="ttk.Checkbutton">
             <property name="text" translatable="yes">Buy 1350BE Champions</property>
             <layout>
               <property name="column">0</property>
@@ -164,7 +176,7 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="buy_3150">
+          <object id="buy_3150" class="ttk.Checkbutton">
             <property name="text" translatable="yes">Buy 3150BE Champions</property>
             <layout>
               <property name="column">0</property>
@@ -176,7 +188,7 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="buy_4800">
+          <object id="buy_4800" class="ttk.Checkbutton">
             <property name="text" translatable="yes">Buy 4800BE Champions</property>
             <layout>
               <property name="column">0</property>
@@ -188,7 +200,7 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="buy_6300">
+          <object id="buy_6300" class="ttk.Checkbutton">
             <property name="text" translatable="yes">Buy 6300BE Champions</property>
             <layout>
               <property name="column">0</property>
@@ -200,7 +212,7 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="change_icon">
+          <object id="change_icon" class="ttk.Checkbutton">
             <property name="text" translatable="yes">Change Summoner Icon</property>
             <layout>
               <property name="column">0</property>
@@ -212,7 +224,7 @@
           </object>
         </child>
         <child>
-          <object class="tk.Button" id="start">
+          <object id="start" class="tk.Button">
             <property name="command">start</property>
             <property name="text" translatable="yes">Start</property>
             <property name="width">10</property>
@@ -225,7 +237,7 @@
           </object>
         </child>
         <child>
-          <object class="tk.Button" id="import_csv">
+          <object id="import_csv" class="tk.Button">
             <property name="command">import_csv</property>
             <property name="text" translatable="yes">Import Csv</property>
             <property name="width">10</property>
@@ -237,7 +249,7 @@
           </object>
         </child>
         <child>
-          <object class="tk.Button" id="export_csv">
+          <object id="export_csv" class="tk.Button">
             <property name="command">export_csv</property>
             <property name="text" translatable="yes">Export Csv</property>
             <property name="width">10</property>
@@ -250,7 +262,7 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Progressbar" id="progress">
+          <object id="progress" class="ttk.Progressbar">
             <property name="length">250</property>
             <property name="orient">horizontal</property>
             <layout>
@@ -263,7 +275,7 @@
           </object>
         </child>
         <child>
-          <object class="ttk.Checkbutton" id="redeem_waterloo">
+          <object id="redeem_waterloo" class="ttk.Checkbutton">
             <property name="text" translatable="yes">Redeem Waterloo (Miss Fortune)</property>
             <layout>
               <property name="column">0</property>
@@ -275,7 +287,7 @@
           </object>
         </child>
         <child>
-          <object class="tk.Label" id="import_note">
+          <object id="import_note" class="tk.Label">
             <property name="text" translatable="yes">Note: Accounts csv must be uploaded
 in username:password format.</property>
             <layout>
@@ -289,7 +301,7 @@ in username:password format.</property>
       </object>
     </child>
     <child>
-      <object class="tk.LabelFrame" id="accounts_frame">
+      <object id="accounts_frame" class="tk.LabelFrame">
         <property name="height">382</property>
         <property name="text" translatable="yes">Accounts</property>
         <property name="width">438</property>
@@ -300,7 +312,7 @@ in username:password format.</property>
           <property name="sticky">nw</property>
         </layout>
         <child>
-          <object class="ttk.Treeview" id="accounts">
+          <object id="accounts" class="ttk.Treeview">
             <property name="height">16</property>
             <property name="selectmode">extended</property>
             <property name="show">headings</property>
@@ -311,7 +323,7 @@ in username:password format.</property>
               <property name="sticky">w</property>
             </layout>
             <child>
-              <object class="ttk.Treeview.Column" id="Column_1">
+              <object id="Column_1" class="ttk.Treeview.Column">
                 <property name="column_anchor">w</property>
                 <property name="heading_anchor">w</property>
                 <property name="minwidth">20</property>
@@ -323,7 +335,7 @@ in username:password format.</property>
               </object>
             </child>
             <child>
-              <object class="ttk.Treeview.Column" id="Column_2">
+              <object id="Column_2" class="ttk.Treeview.Column">
                 <property name="column_anchor">w</property>
                 <property name="heading_anchor">w</property>
                 <property name="minwidth">20</property>
@@ -335,7 +347,7 @@ in username:password format.</property>
               </object>
             </child>
             <child>
-              <object class="ttk.Treeview.Column" id="Column_3">
+              <object id="Column_3" class="ttk.Treeview.Column">
                 <property name="column_anchor">w</property>
                 <property name="heading_anchor">w</property>
                 <property name="minwidth">20</property>
@@ -351,7 +363,7 @@ in username:password format.</property>
       </object>
     </child>
     <child>
-      <object class="tk.LabelFrame" id="console_frame">
+      <object id="console_frame" class="tk.LabelFrame">
         <property name="height">200</property>
         <property name="text" translatable="yes">Console</property>
         <property name="width">700</property>
@@ -363,7 +375,7 @@ in username:password format.</property>
           <property name="sticky">nw</property>
         </layout>
         <child>
-          <object class="tk.Text" id="console">
+          <object id="console" class="tk.Text">
             <property name="height">11</property>
             <property name="insertofftime">0</property>
             <property name="width">85</property>

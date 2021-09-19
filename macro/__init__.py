@@ -10,6 +10,7 @@ import urllib3
 
 from client.chest import forge_all_tokens
 from client.chest import forge_keys_and_open_generic_chests
+from client.chest import forge_keys_and_open_masterwork_chests
 from client.exceptions import AccountChangeNeededException
 from client.exceptions import LogoutNeededException
 from client.exceptions import LootRetrieveException
@@ -61,6 +62,7 @@ class Macro:
         handlers = {
             'open_champion_capsules': (open_champion_capsules, state, {}),
             'open_generic_chests': (forge_keys_and_open_generic_chests, state, {}),
+            'open_masterwork_chests': (forge_keys_and_open_masterwork_chests, state, {}),
             'forge_tokens': (forge_all_tokens, state, {}),
             'redeem_free': (redeem_free, state, {}),
             'redeem_450': (redeem, [*state, 450], {}),

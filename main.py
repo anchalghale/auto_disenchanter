@@ -29,6 +29,7 @@ urllib3.disable_warnings()
 
 OPTIONS = [
     'open_generic_chests',
+    'open_masterwork_chests',
     'forge_tokens',
     'open_champion_capsules',
     'redeem_free',
@@ -44,7 +45,7 @@ OPTIONS = [
     'buy_3150',
     'buy_4800',
     'buy_6300',
-    'change_icon'
+    'change_icon',
 ]
 
 
